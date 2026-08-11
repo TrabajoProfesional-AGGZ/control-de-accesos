@@ -35,22 +35,24 @@ export class ErrorBoundary extends Component {
           <p style={{ color: '#4A4A4A', margin: 0 }}>
             Ocurrió un error inesperado. Copiá el mensaje de abajo si le vas a avisar a soporte.
           </p>
-          <pre
-            style={{
-              maxWidth: '600px',
-              overflow: 'auto',
-              textAlign: 'left',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #111111',
-              borderRadius: '8px',
-              padding: '1rem',
-              fontSize: '0.8rem',
-            }}
-          >
-            {this.state.error.message}
-            {'\n'}
-            {this.state.error.stack}
-          </pre>
+          {import.meta.env.DEV && (
+            <pre
+              style={{
+                maxWidth: '600px',
+                overflow: 'auto',
+                textAlign: 'left',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #111111',
+                borderRadius: '8px',
+                padding: '1rem',
+                fontSize: '0.8rem',
+              }}
+            >
+              {this.state.error.message}
+              {'\n'}
+              {this.state.error.stack}
+            </pre>
+          )}
           <button
             onClick={() => window.location.reload()}
             style={{
