@@ -1,4 +1,4 @@
-# Aplicación (para empleados) SocioUnido
+# Aplicación SocioUnido (Empleados)
 
 Aplicación móvil de "SocioUnido" para empleados.
 
@@ -17,11 +17,3 @@ Para más detalles, revisar el archivo `LICENSE` incluido en este repositorio.
 ## Página documental
 
 Desarrollada con [Just the Docs](https://just-the-docs.com/).
-
-## Setup
-
-```bash
-npm install
-cp .env.local.example .env.local   # completar con las credenciales de Firebase y la URL del gateway
-npm run dev                        # http://localhost:5138
-```
