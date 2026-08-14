@@ -6,22 +6,31 @@ nav_order: 5
 
 # 📊 Métricas de la implementación
 
-Este espacio está destinado a medir el trabajo, la participación y el progreso del equipo exclusivamente en el desarrollo la aplicación.
+Este espacio está destinado a medir el trabajo, la participación y el progreso del equipo en el desarrollo de la aplicación web PWA de Control de Accesos. Los siguientes datos combinan métricas en tiempo real conectadas a la API de GitHub con un análisis estático de la distribución del repositorio.
 
 ## Resumen del repositorio
 
-* **Cantidad total de Commits:** [Número]
-* **Pull Requests (PRs) cerrados/aprobados:** [Número]
-* **Issues resueltos:** [Número]
+* **Actividad de commits:** ![Commits](https://img.shields.io/github/commit-activity/y/trabajoprofesional-aggz/control-de-accesos)
+* **Pull Requests cerrados:** ![PRs](https://img.shields.io/github/issues-pr-closed/trabajoprofesional-aggz/control-de-accesos)
+* **Issues resueltos:** ![Issues](https://img.shields.io/github/issues-closed/trabajoprofesional-aggz/control-de-accesos)
+* **Última versión:** ![Release](https://img.shields.io/github/v/release/trabajoprofesional-aggz/control-de-accesos)
 
-## Distribución del trabajo
+## Composición del código (Lenguajes)
 
-A continuación se detalla el porcentaje aproximado de participación y áreas de enfoque de quienes trabajaron en la aplicación:
+Basado en el análisis automático del repositorio, la distribución tecnológica de esta interfaz es la siguiente:
 
-| Miembro del equipo | Porcentaje de contribución | Rol / Foco principal (Ej: Backend, Testing, DevOps) |
-| :--- | :---: | :--- |
-| **[Nombre 1]** | XX% | [Foco] |
-| **[Nombre 2]** | XX% | [Foco] |
-| **[Nombre 3]** | XX% | [Foco] |
+* 🔵 **JavaScript:** 71.6%
+* 🟣 **CSS:** 27.4%
+* ⚪ **Other:** 1%
 
-*(Nota: Estos datos pueden ser extraídos de las estadísticas (Insights) del repositorio).*
+## Distribución del trabajo (Contributors)
+
+A continuación se detalla la participación de cada miembro del equipo basándonos en la estadística de "Contributors", la cual contempla tanto la cantidad de commits como el volumen de código impactado:
+
+| Miembro del equipo (GitHub User) | Commits Totales | Líneas Agregadas (++) | Líneas Eliminadas (--) |
+| :--- | :---: | :---: | :---: |
+| **Zielonka, Axel (`axel-zielonka`)** | 13 | 16.655 | 405 |
+| **Ghosn, Lautaro Gabriel (`LGhosn`)** | 7 | 842 | 368 |
+| **Ascencio, Felipe Santino (`FelipeAscencio`)** | 7 | 673 | 298 |
+
+*(Nota: Cualquier diferencia entre el total de commits del repositorio y la suma de los aportes individuales corresponde a operaciones de mantenimiento automatizado realizadas por herramientas como `dependabot`).*

@@ -6,23 +6,23 @@ nav_order: 3
 
 # 🛠️ Justificación tecnológica
 
-En esta sección documentamos las decisiones técnicas tomadas para la construcción de la aplicación, asegurando que cada herramienta elegida aporte valor real al desarrollo y mantenimiento del producto.
+En esta sección documentamos las decisiones técnicas tomadas para la construcción de la PWA de Control de Accesos, asegurando que el personal de seguridad cuente con una herramienta rápida, estable y compatible con sus dispositivos de trabajo.
 
-## Lenguajes y Frameworks
+## Lenguajes, Frameworks y Herramientas
 
-X.
+La prioridad para el entorno de empleados fue la integración con hardware (cámaras) y la velocidad de respuesta en la validación:
 
-## Integración y Despliegue Continuo (CI/CD)
+* **React + Vite:** Utilizamos React por su ecosistema maduro basado en componentes (JSX), lo que nos permite reutilizar elementos de la interfaz de manera modular. Optamos por **Vite** debido a su velocidad de compilación ultrarrápida y recarga en caliente (HMR), agilizando drásticamente el ciclo de desarrollo.
+* **JavaScript y CSS Modular:** Mantenemos JavaScript puro combinado con CSS tradicional (mediante variables y tokens en `tokens.css` y `control-theme.css`), facilitando la personalización de "marca blanca" requerida por los distintos clubes.
+* **Integración de cámara (Escáner QR):** La aplicación web se comunica mediante APIs nativas del navegador para utilizar la cámara del celular o tablet como lector de códigos de barras bidimensionales, evitando la compra de hardware de escaneo dedicado.
+* **Progressive Web App (PWA):** La app está configurada para instalarse como PWA (`pwa-192x192.png`, `pwa-512x512.png`), permitiendo a los guardias iniciar el control desde un ícono en su pantalla de inicio como si fuera una aplicación nativa.
 
-La implementación de pipelines de CI/CD es fundamental en la aplicación para garantizar entregas ágiles y seguras. Nos permite automatizar la ejecución de pruebas y el despliegue a los distintos entornos, reduciendo el error humano y acelerando el *time-to-market*.
+## Calidad y Testing
 
-## Pruebas unitarias y Code Coverage
+* **Jest:** Nuestro entorno principal de pruebas unitarias (`jest.config.cjs` y archivos `*.test.js`), que asegura la correcta inicialización del lector y las lógicas de validación visual del estado del socio.
+* **ESLint:** Configurado (`eslint.config.js`) para mantener un estándar de codificación limpio, previniendo errores de sintaxis a nivel de todo el equipo.
 
-Para asegurar la robustez y estabilidad del código, mantenemos un estándar estricto de calidad:
+## Integración y Despliegue (CI/CD)
 
-* Se ha implementado una gran cantidad de pruebas unitarias cubriendo los casos de uso principales y casos borde.
-* Mantenemos un **estricto nivel de Code Coverage** (cobertura de código) fijado en un mínimo del **[90]%**, el cual es validado automáticamente en cada Pull Request mediante nuestro pipeline.
-
-## Documentación integral
-
-Utilizamos **JustTheDocs** para mantener esta documentación viva, versionada junto con el código y fácilmente accesible para cualquier miembro del equipo. Esto centraliza el conocimiento y reduce los cuellos de botella en la comunicación.
+* **Vercel:** La plataforma elegida para el despliegue automático del frontend. Ofrece una CDN global y optimización de caché, asegurando que el personal siempre interactúe con la versión más reciente.
+* **GitHub Actions:** Contamos con flujos automatizados (`frontend-tests.yml`) para asegurar que todo el código nuevo apruebe las pruebas establecidas antes de fusionarse a la rama principal.
