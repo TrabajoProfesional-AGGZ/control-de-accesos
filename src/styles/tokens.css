@@ -3,18 +3,26 @@
   color-scheme: light;
 
   /* Colors */
-  --color-text-primary: #111111;
-  --color-text-secondary: #4a4a4a;
-  --color-bg: #f5f5f5;
-  --color-surface: #ffffff;
-  --color-border: #e8e8e8;
-  --color-border-medium: #d0d0d0;
-  --color-border-strong: #111111;
-  --color-border-light: #efefef;
+  /* Paleta de club (rama demo): Mamelodi Sundowns — #FFDC00 / #039F5D / #FFD25A.
+     Ver nota "Colores por club (rama demo)" más abajo en el CLAUDE.md de este
+     repo. Solo los 4 tokens de marca (text-primary/border-strong, accent,
+     accent-hover) llevan el color de club exacto — el resto de la paleta son
+     grises con temperatura dorada en vez de neutros puros, pero sin
+     saturación de marca (misma convención que WebApp/aplicacion). */
+  --color-text-primary: #0a6b3f;
+  --color-text-secondary: #5c7285;
+  --color-bg: #f8f6f1;
+  --color-surface: #fdfdfc;
+  --color-border: #ebe9e5;
+  --color-border-medium: #e4e0d8;
+  --color-border-strong: #0a6b3f;
+  --color-border-light: #f2f0ee;
+  --color-accent: #ffdc00;
+  --color-accent-hover: #ffd25a;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
-  --color-row-hover: #f8f8f8;
-  --color-bg-subtle: #f0f0f0;
+  --color-row-hover: #f8f8f6;
+  --color-bg-subtle: #f3f1ed;
   --color-overlay: rgba(0, 0, 0, 0.4);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) */
