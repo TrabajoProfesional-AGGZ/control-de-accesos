@@ -5,7 +5,7 @@ nav_order: 1
 description: "Documentación de la Aplicación PWA de Control de Accesos"
 ---
 
-# Aplicación PWA (Control de Accesos)
+# Aplicación (PWA) para empleados
 
 Aplicación frontend de "SocioUnido" orientada exclusivamente a los empleados del club, desarrollada como Progressive Web App (PWA) para facilitar el control físico de la institución desde cualquier dispositivo móvil o terminal.
 
@@ -24,5 +24,5 @@ A continuación, se detalla toda la información visual, técnica y organizativa
 
 * 📱 **[Interfaces](interfaces.html):** Galería visual de las pantallas principales de la aplicación, contrastando el tema neutro con un caso de uso real (Mamelodi Sundowns).
 * 🛠️ **[Justificación tecnológica](justificacion.html):** El porqué de los lenguajes y librerías elegidas, nuestro pipeline de CI/CD, estrategia de testing y despliegue.
-* 🏗️ **[Arquitectura y diagramas](diagramas.html):** Representación visual de la arquitectura de la aplicación utilizando los modelos C3 y C4.
+* 🏗️ **[Arquitectura y diagramas](diagramas.html):** Representación visual de la arquitectura de la aplicación utilizando el modelo C4.
 * 📊 **[Métricas de la implementación](metricas.html):** Estadísticas del desarrollo, cantidad de commits, Pull Requests y distribución del trabajo en el equipo frontend.
