@@ -30,15 +30,12 @@ jobs:
 
       - name: Reemplazar archivo y pushear
         run: |
-          # Reemplaza el archivo generado con el nombre final en la raíz del proyecto
-          # Si lo tenés en una carpeta, cambialo a: mv metricas_generadas.md docs/metricas.md
           mv metricas_generadas.md metricas.md 
           
-          # Configuramos la identidad del bot
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           
-          # Agregamos el archivo, commiteamos y subimos los cambios
           git add metricas.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "📊 Actualización automática de métricas locales"
+          # El cambio está en la línea de abajo, agregando [skip ci] al final del mensaje
+          git diff --quiet && git diff --staged --quiet || git commit -m "📊 Actualización automática de métricas locales [skip ci]"
           git push
