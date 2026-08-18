@@ -99,7 +99,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
       if (err.message === 'empleado-no-encontrado' || codigosCredencialesInvalidas.includes(err.code)) {
         setError('Credenciales incorrectas');
       } else {
-        setError(err.message || 'Ocurrió un error al iniciar sesión.');
+        setError('Servicio no disponible');
       }
       setCargando(false);
     }

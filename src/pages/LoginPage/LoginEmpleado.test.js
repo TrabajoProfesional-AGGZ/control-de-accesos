@@ -101,6 +101,20 @@ describe('LoginEmpleado', () => {
     });
   });
 
+  test('muestra "Servicio no disponible" cuando falla por otro motivo (no de credenciales)', async () => {
+    authService.login.mockRejectedValueOnce({ code: 'auth/network-request-failed', message: 'Error de red' });
+    render(<LoginEmpleado irAReclamo={() => {}} />);
+
+    fireEvent.change(screen.getByLabelText('Email o legajo'), { target: { value: 'empleado@club.com' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'clave123' } });
+    fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Servicio no disponible')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Credenciales incorrectas')).not.toBeInTheDocument();
+  });
+
   test('llama a irAReclamo al hacer click en el link de primera vez', () => {
     const irAReclamo = jest.fn();
     render(<LoginEmpleado irAReclamo={irAReclamo} />);
