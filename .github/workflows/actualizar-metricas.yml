@@ -1,0 +1,44 @@
+name: Actualizar Métricas Locales
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias de Python
+        run: pip install requests
+
+      - name: Generar archivo de métricas
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/generar_metricas.py
+
+      - name: Reemplazar archivo y pushear
+        run: |
+          # Reemplaza el archivo generado con el nombre final en la raíz del proyecto
+          # Si lo tenés en una carpeta, cambialo a: mv metricas_generadas.md docs/metricas.md
+          mv metricas_generadas.md metricas.md 
+          
+          # Configuramos la identidad del bot
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Agregamos el archivo, commiteamos y subimos los cambios
+          git add metricas.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "📊 Actualización automática de métricas locales"
+          git push
