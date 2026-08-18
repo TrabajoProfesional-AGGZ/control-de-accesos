@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
             setAuthError(null);
           } else {
             setEmpleado(null);
-            setAuthError('No pudimos cargar tu perfil. Probá de nuevo en unos segundos.');
+            setAuthError('Servicio no disponible');
           }
         } catch (error) {
           console.error('Error al recuperar el perfil del empleado:', error);
