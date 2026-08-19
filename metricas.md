@@ -11,8 +11,8 @@ Este espacio está destinado a medir el trabajo, la participación y el progreso
 ## Resumen del repositorio
 
 * **Actividad de commits:** ![Commits](https://img.shields.io/badge/Commits_Totales-41-blue)
-* **Pull Requests cerrados:** ![PRs](https://img.shields.io/badge/PRs_Cerrados-4-purple)
-* **Issues resueltos:** ![Issues](https://img.shields.io/badge/Issues_Resueltos-7-green)
+* **Pull Requests cerrados:** ![PRs](https://img.shields.io/badge/PRs_Cerrados-6-purple)
+* **Issues resueltos:** ![Issues](https://img.shields.io/badge/Issues_Resueltos-8-green)
 
 ## Composición del código (Lenguajes)
 
