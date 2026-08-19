@@ -31,7 +31,7 @@ commits_url = f'https://api.github.com/repos/{repo_privado}/commits?per_page=100
 conteo_autores = {}
 total_commits_repo = 0
 
-# Diccionario para formatear los nombres de Felipe y el equipo
+# Diccionario para formatear los nombres del equipo
 nombres_equipo = {
     "LGhosn": "Ghosn, Lautaro Gabriel",
     "axel-zielonka": "Zielonka, Axel",
@@ -61,8 +61,8 @@ while commits_url:
         else:
             author = commit.get('commit', {}).get('author', {}).get('name', '')
             
-        # OMITIR a dependabot y cualquier otro bot
-        if not author or 'bot' in author.lower() or 'dependabot' in author.lower():
+        # OMITIR a dependabot, actions-user y cualquier otro bot
+        if not author or 'bot' in author.lower() or 'dependabot' in author.lower() or 'actions-user' in author.lower():
             continue
             
         sha = commit['sha']
