@@ -33,8 +33,10 @@ body {
 }
 
 .login-band-logo {
-  width: clamp(160px, 60vw, 500px);
-  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-width: clamp(160px, 70vw, 420px);
+  max-height: 70%;
 }
 
 .login-form-wrapper {
