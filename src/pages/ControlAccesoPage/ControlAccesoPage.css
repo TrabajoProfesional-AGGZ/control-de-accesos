@@ -17,9 +17,9 @@
   gap: var(--space-4);
   padding: var(--space-5) var(--space-5) var(--space-6);
   background:
-    radial-gradient(120% 140% at 12% -10%, #4a3a1a 0%, transparent 55%),
-    radial-gradient(120% 140% at 88% 110%, #4a3a1a 0%, transparent 55%),
-    linear-gradient(155deg, #0d2318 0%, #07140f 42%, #040a10 100%);
+    radial-gradient(120% 140% at 12% -10%, #4a1a2b 0%, transparent 55%),
+    radial-gradient(120% 140% at 88% 110%, #4a1a2b 0%, transparent 55%),
+    linear-gradient(155deg, #230d15 0%, #14070c 42%, #100408 100%);
   color: var(--color-surface);
   border-radius: var(--radius-xl);
   box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);

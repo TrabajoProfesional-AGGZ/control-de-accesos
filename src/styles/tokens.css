@@ -3,26 +3,27 @@
   color-scheme: light;
 
   /* Colors */
-  /* Paleta de club (rama demo): Mamelodi Sundowns — #FFDC00 / #039F5D / #FFD25A.
+  /* Paleta de club (rama demo): Inter Miami CF — #231F20 / #F7B5CD / #FFFFFF.
      Ver nota "Colores por club (rama demo)" más abajo en el CLAUDE.md de este
      repo. Solo los 4 tokens de marca (text-primary/border-strong, accent,
      accent-hover) llevan el color de club exacto — el resto de la paleta son
-     grises con temperatura dorada en vez de neutros puros, pero sin
+     grises con temperatura rosada en vez de neutros puros, pero sin
      saturación de marca (misma convención que WebApp/aplicacion). */
-  --color-text-primary: #0a6b3f;
+  --color-text-primary: #231f20;
   --color-text-secondary: #5c7285;
-  --color-bg: #f8f6f1;
-  --color-surface: #fdfdfc;
-  --color-border: #ebe9e5;
-  --color-border-medium: #e4e0d8;
-  --color-border-strong: #0a6b3f;
-  --color-border-light: #f2f0ee;
-  --color-accent: #ffdc00;
-  --color-accent-hover: #ffd25a;
+  --color-bg: #f1dfe7;
+  --color-surface: #fdfcfc;
+  --color-border: #ebe5e7;
+  --color-border-medium: #e4d8dc;
+  --color-border-strong: #231f20;
+  --color-border-light: #f2eeef;
+  --color-accent: #f7b5cd;
+  --color-accent-hover: #ffffff;
+  --color-accent-dark: #d36990;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
-  --color-row-hover: #f8f8f6;
-  --color-bg-subtle: #f3f1ed;
+  --color-row-hover: #f8f6f7;
+  --color-bg-subtle: #edd9e0;
   --color-overlay: rgba(0, 0, 0, 0.4);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) */

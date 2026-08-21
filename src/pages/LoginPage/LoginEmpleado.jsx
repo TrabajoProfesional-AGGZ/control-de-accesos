@@ -135,7 +135,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
           initial={{ height: '100%' }}
           animate={
             exiting
-              ? { height: '100%', backgroundColor: ['#039F5D', '#4A4A4A', '#F5F5F5'] }
+              ? { height: '100%', backgroundColor: ['#F7B5CD', '#4A4A4A', '#F5F5F5'] }
               : { height: animStarted ? '30%' : '100%' }
           }
           transition={
@@ -156,6 +156,14 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
+          <motion.p
+            className="login-band-caption"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+          >
+            By SocioUnido
+          </motion.p>
         </motion.div>
       )}
 

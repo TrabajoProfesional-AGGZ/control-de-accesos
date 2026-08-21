@@ -27,14 +27,32 @@ body {
   min-height: 140px;
   background-color: var(--color-text-primary);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: var(--space-2);
   z-index: 50;
 }
 
 .login-band-logo {
-  width: clamp(160px, 60vw, 500px);
-  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-width: clamp(160px, 70vw, 420px);
+  max-height: 70%;
+}
+
+.login-band-caption {
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  /* fondo oscuro translúcido: el caption se mantiene legible durante toda la
+     transición de color del band al entrar a la app (negro -> gris -> casi blanco) */
+  background-color: rgba(35, 31, 32, 0.4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-surface);
 }
 
 .login-form-wrapper {
