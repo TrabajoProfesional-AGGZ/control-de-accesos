@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './ModalOverlay.css';
 
+/** Fondo modal genérico: cierra con Escape o clic fuera del contenido. */
 export function ModalOverlay({ onClose, wrapperClass, children }) {
   useEffect(() => {
     const manejarTecla = (e) => {

@@ -1,5 +1,6 @@
 import { Component } from 'react';
 
+/** Captura errores de render no manejados y muestra una pantalla de fallback. */
 export class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -35,6 +36,7 @@ export class ErrorBoundary extends Component {
           <p style={{ color: '#4A4A4A', margin: 0 }}>
             Ocurrió un error inesperado. Copiá el mensaje de abajo si le vas a avisar a soporte.
           </p>
+          {/* Stack trace solo en DEV: en producción no se expone al usuario final */}
           {import.meta.env.DEV && (
             <pre
               style={{
