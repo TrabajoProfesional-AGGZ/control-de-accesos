@@ -58,6 +58,14 @@ body {
   font-weight: 400;
 }
 
+@media (max-width: 480px) {
+  .login-slogan {
+    /* En mobile la banda del logo ocupa proporcionalmente más alto, así que
+       el mismo margen fijo que en desktop deja el texto pegado a la banda. */
+    margin-top: 9.5rem;
+  }
+}
+
 .login-error {
   color: var(--color-danger);
   font-size: 0.85rem;
