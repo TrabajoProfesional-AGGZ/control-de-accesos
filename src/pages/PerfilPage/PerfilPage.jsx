@@ -5,10 +5,12 @@ import { useCambiarContrasenia } from '../../hooks/useCambiarContrasenia';
 import { MAX_LEN, validarFortalezaPassword } from '../../utils/formValidators';
 import './PerfilPage.css';
 
+/** Iniciales de nombre y apellido para el avatar (ej. "Carlos Gomez" → "CG"). */
 function iniciales(nombre, apellido) {
   return `${nombre?.[0] ?? ''}${apellido?.[0] ?? ''}`.toUpperCase();
 }
 
+/** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, error }) {
   const [mostrar, setMostrar] = useState(false);
   return (
@@ -36,6 +38,7 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
   );
 }
 
+/** Modal de cambio de contraseña, con validación de fortaleza en tiempo real. */
 function CambiarContraseniaModal({ cerrarSesion, onClose }) {
   const {
     actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit,
@@ -118,6 +121,7 @@ function CambiarContraseniaModal({ cerrarSesion, onClose }) {
   );
 }
 
+/** Datos del empleado (legajo, DNI, mail) + cambiar contraseña + cerrar sesión. */
 export function PerfilPage({ empleado, cerrarSesion }) {
   const [modalAbierto, setModalAbierto] = useState(false);
 

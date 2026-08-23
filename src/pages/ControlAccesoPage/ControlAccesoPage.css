@@ -122,39 +122,51 @@
   transition: color var(--transition-normal);
 }
 
-.modo-operacion-select-wrapper {
+.modo-operacion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   margin-top: var(--space-2);
 }
 
-.modo-operacion-select {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 100%;
-  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
+.modo-operacion-chip {
   border: 1px solid var(--color-border-medium);
   background-color: var(--color-surface);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--space-3) center;
-  background-size: 16px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.modo-operacion-select:focus {
-  outline: none;
-  border-color: var(--color-text-primary);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
-}
-
-.modo-operacion-select:disabled {
-  cursor: not-allowed;
   color: var(--color-text-secondary);
-  background-color: var(--color-bg-subtle);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.modo-operacion-chip:hover:not(:disabled):not(.modo-operacion-chip--selected) {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.modo-operacion-chip:focus-visible {
+  outline: 2px solid var(--color-border-strong);
+  outline-offset: 2px;
+}
+
+.modo-operacion-chip--selected {
+  background-color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-surface);
+}
+
+.modo-operacion-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.modo-operacion--evento .modo-operacion-chip--selected {
+  background-color: var(--status-warning-border);
+  border-color: var(--status-warning-border);
+  color: var(--color-surface);
 }
 
 .modo-operacion--evento {
@@ -166,14 +178,6 @@
 
 .modo-operacion--evento .modo-operacion-label-icono {
   color: var(--status-warning-border);
-}
-
-.modo-operacion--evento .modo-operacion-select {
-  border-color: var(--status-warning-border);
-}
-
-.modo-operacion--evento .modo-operacion-select:focus {
-  box-shadow: 0 0 0 3px rgba(154, 98, 0, 0.12);
 }
 
 .modo-operacion-loading {

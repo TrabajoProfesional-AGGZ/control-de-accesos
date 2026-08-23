@@ -4,6 +4,10 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { AuthContext } from './authContextObject';
 
+/**
+ * Escucha el estado de sesión de Firebase y, si hay usuario logueado,
+ * completa el perfil del empleado pidiéndolo a `ms-club` por email.
+ */
 export function AuthProvider({ children }) {
   const [empleado, setEmpleado] = useState(null);
   const [cargandoAuth, setCargandoAuth] = useState(true);

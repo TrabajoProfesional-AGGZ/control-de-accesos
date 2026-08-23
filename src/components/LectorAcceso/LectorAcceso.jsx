@@ -6,6 +6,11 @@ import './LectorAcceso.css';
 
 const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero: null };
 
+/**
+ * Lector de QR de acceso: arranca la cámara al montar, valida cada escaneo
+ * contra `ms-acceso` y muestra el resultado superpuesto sobre la cámara.
+ * @param {string} idEvento - id del evento a validar contra la entrada del socio (vacío = ingreso normal al club).
+ */
 export const LectorAcceso = ({ idEvento }) => {
   const [resultado, setResultado] = useState(ESTADO_INICIAL);
   const [validando, setValidando] = useState(false);
@@ -20,12 +25,9 @@ export const LectorAcceso = ({ idEvento }) => {
   }, [idEvento]);
 
   useEffect(() => {
-    // html5-qrcode llama a video.play() internamente sin awaitear ni capturar la promesa
-    // (ver RenderedCameraImpl.setupSurface en su código fuente). Si el elemento de video se
-    // desmonta mientras esa promesa sigue pendiente -típicamente durante el doble montaje de
-    // StrictMode en dev, ver `cancelado` más abajo- Chrome la rechaza con un AbortError que
-    // nadie atrapa. No hay forma de engancharse a esa promesa desde afuera, así que se ignora
-    // puntualmente ese caso conocido (y solo ese) para no ensuciar la consola con ruido inofensivo.
+    // html5-qrcode no awaitea su video.play() interno: si el video se desmonta con esa promesa
+    // pendiente (doble montaje de StrictMode en dev), Chrome la rechaza con un AbortError que
+    // no se puede capturar desde afuera. Se ignora puntualmente ese caso para no ensuciar la consola.
     function ignorarAbortDePlayInterrumpido(event) {
       if (
         event.reason instanceof DOMException &&
