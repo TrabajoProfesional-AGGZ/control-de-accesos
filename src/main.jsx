@@ -7,6 +7,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 
+// Registro del service worker de la PWA (vite-plugin-pwa).
 registerSW({
   onNeedRefresh() {
     console.log("Hay una nueva versión disponible. (Se actualizará sola en breve)");

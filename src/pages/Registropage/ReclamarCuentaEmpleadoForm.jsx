@@ -10,6 +10,7 @@ import '../../control-theme.css';
 import '../../components/createForm/ModalOverlay.css';
 import './ReclamarCuentaEmpleadoForm.css';
 
+/** Campo de contraseña con label y botón para mostrar/ocultar el valor. */
 function PasswordField({ id, label, value, onChange, autoComplete, error }) {
   const [mostrar, setMostrar] = useState(false);
   return (
@@ -40,6 +41,7 @@ function PasswordField({ id, label, value, onChange, autoComplete, error }) {
   );
 }
 
+/** Reclamo de cuenta (legajo + DNI + mail + contraseña) en un solo paso, con Saga de rollback en Firebase. */
 export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
   const [legajo, setLegajo] = useState('');
   const [mail, setMail] = useState('');
@@ -50,6 +52,7 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
   const [cargando, setCargando] = useState(false);
   const [exito, setExito] = useState(false);
 
+  // Evita setState tras desmontar (el onSuccess de más abajo dispara un setTimeout).
   const montadoRef = useRef(true);
   useEffect(() => () => { montadoRef.current = false; }, []);
 
@@ -95,6 +98,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         if (montadoRef.current) onSuccess();
       }, 1500);
     } catch (err) {
+      // Saga: si el usuario de Firebase se llegó a crear pero el reclamo en el
+      // backend falla, se deshace el alta en Firebase para no dejar cuentas huérfanas.
       if (usuarioCreado) {
         try {
           await deleteUser(usuarioCreado);

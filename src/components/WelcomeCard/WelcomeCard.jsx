@@ -1,5 +1,6 @@
 import './WelcomeCard.css';
 
+/** Banner de bienvenida de la home: fecha, saludo y legajo del empleado. */
 export function WelcomeCard({ empleado }) {
   const fechaFormateada = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',

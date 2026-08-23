@@ -7,6 +7,10 @@ import { HomePage } from './pages/HomePage/HomePage';
 import './control-theme.css';
 import { useAuth } from './hooks/useAuth';
 
+/**
+ * Componente raíz: enruta entre login/reclamo de cuenta y el dashboard
+ * según el estado de autenticación (sin react-router-dom, con `useState`).
+ */
 export default function App() {
   const [mostrarReclamo, setMostrarReclamo] = useState(false);
   const [vista, setVista] = useState('auth');
