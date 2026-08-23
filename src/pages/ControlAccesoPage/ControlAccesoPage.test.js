@@ -33,16 +33,18 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
 
     await waitForElementToBeRemoved(() => screen.queryByText('Cargando eventos...'));
 
-    const select = screen.getByLabelText('Modo de Operación:');
-    expect(select).not.toBeDisabled();
-    
-    expect(screen.getByText('Validar entrada: Partido de Verano')).toBeInTheDocument();
+    const chipNormal = screen.getByRole('radio', { name: 'Ingreso normal al club' });
+    expect(chipNormal).not.toBeDisabled();
+
+    const chipEvento = screen.getByRole('radio', { name: 'Validar entrada: Partido de Verano' });
+    expect(chipEvento).toBeInTheDocument();
 
     expect(screen.getByTestId('lector-mock')).toHaveTextContent('Evento ID:');
 
-    await userEvent.selectOptions(select, 'evento-123');
+    await userEvent.click(chipEvento);
 
     expect(screen.getByTestId('lector-mock')).toHaveTextContent('Evento ID: evento-123');
+    expect(chipEvento).toHaveAttribute('aria-checked', 'true');
   });
 
   test('maneja el error si falla la carga de eventos', async () => {
@@ -54,9 +56,9 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
 
     await waitForElementToBeRemoved(() => screen.queryByText('Cargando eventos...'));
 
-    const select = screen.getByLabelText('Modo de Operación:');
-    expect(select).not.toBeDisabled();
-    
+    const chipNormal = screen.getByRole('radio', { name: 'Ingreso normal al club' });
+    expect(chipNormal).not.toBeDisabled();
+
     expect(screen.queryByText(/Validar entrada:/)).not.toBeInTheDocument();
 
     consoleSpy.mockRestore();

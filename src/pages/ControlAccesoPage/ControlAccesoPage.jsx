@@ -50,25 +50,34 @@ export function ControlAccesoPage({ onVolver }) {
       </div>
 
       <div className={`modo-operacion${eventoSeleccionado ? ' modo-operacion--evento' : ''}`}>
-        <label htmlFor="select-evento" className="modo-operacion-label">
+        <span className="modo-operacion-label">
           <SlidersHorizontal size={15} className="modo-operacion-label-icono" aria-hidden="true" />
           Modo de Operación:
-        </label>
-        <div className="modo-operacion-select-wrapper">
-          <select
-            id="select-evento"
-            className="modo-operacion-select"
-            value={eventoSeleccionado}
-            onChange={(e) => setEventoSeleccionado(e.target.value)}
+        </span>
+        <div className="modo-operacion-chips" role="radiogroup" aria-label="Modo de Operación">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={eventoSeleccionado === ''}
             disabled={cargandoEventos}
+            onClick={() => setEventoSeleccionado('')}
+            className={`modo-operacion-chip${eventoSeleccionado === '' ? ' modo-operacion-chip--selected' : ''}`}
           >
-            <option value="">Ingreso normal al club</option>
-            {eventos.map((evento) => (
-              <option key={evento.id} value={evento.id}>
-                Validar entrada: {evento.nombre}
-              </option>
-            ))}
-          </select>
+            Ingreso normal al club
+          </button>
+          {eventos.map((evento) => (
+            <button
+              key={evento.id}
+              type="button"
+              role="radio"
+              aria-checked={eventoSeleccionado === evento.id}
+              disabled={cargandoEventos}
+              onClick={() => setEventoSeleccionado(evento.id)}
+              className={`modo-operacion-chip${eventoSeleccionado === evento.id ? ' modo-operacion-chip--selected' : ''}`}
+            >
+              Validar entrada: {evento.nombre}
+            </button>
+          ))}
         </div>
         {cargandoEventos && <span className="modo-operacion-loading">Cargando eventos...</span>}
       </div>
