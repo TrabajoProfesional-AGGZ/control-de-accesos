@@ -9,6 +9,7 @@ import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import logoAlt from '../../assets/logo_socio_login.png';
 import '../../control-theme.css';
 
+// Variantes de framer-motion para la entrada/salida escalonada del formulario.
 const formContainerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.8 } },
@@ -21,6 +22,7 @@ const formItemVariants = {
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
+/** Formulario de login (email o legajo + contraseña) con animación de banda; navega al completar. */
 export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
   const [identificador, setIdentificador] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +33,8 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
 
   const [animStarted, setAnimStarted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  // Evita llamar onIngresoCompleto dos veces: con animación se dispara al terminar la
+  // transición de la banda, sin animación (reduced motion) se dispara directo por efecto.
   const ingresoCompletoLlamado = useRef(false);
 
   const { empleado, authError, cerrarSesion } = useAuth();
@@ -50,6 +54,8 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
     }
   }, [empleado, shouldReduceMotion, onIngresoCompleto]);
 
+  // Login de Firebase ok pero el backend no pudo resolver el perfil del empleado:
+  // se cierra la sesión y se muestra el error en vez de dejar al usuario "logueado a medias".
   useEffect(() => {
     if (authError && cargando) {
       cerrarSesion().finally(() => {

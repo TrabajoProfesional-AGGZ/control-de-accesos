@@ -5,6 +5,7 @@ import { obtenerMailPorLegajo } from '../../services/empleadosService';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 
+/** Modal para pedir el mail de recuperación de contraseña por email o legajo. */
 export function RecuperarContraseniaModal({ onClose }) {
   const [identificador, setIdentificador] = useState('');
   const [error, setError] = useState('');

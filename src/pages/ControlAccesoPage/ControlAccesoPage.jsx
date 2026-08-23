@@ -4,6 +4,7 @@ import './ControlAccesoPage.css';
 import { useState, useEffect } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
 
+/** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
 function hoyISO() {
   const hoy = new Date();
   const yyyy = hoy.getFullYear();
@@ -12,6 +13,7 @@ function hoyISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** Página de escaneo: selector de modo (ingreso normal o validar entrada a un evento de hoy) + lector QR. */
 export function ControlAccesoPage({ onVolver }) {
   const [eventos, setEventos] = useState([]);
   const [eventoSeleccionado, setEventoSeleccionado] = useState("");

@@ -7,6 +7,7 @@ import { ControlAccesoPage } from '../ControlAccesoPage/ControlAccesoPage';
 import '../../control-theme.css';
 import './HomePage.css';
 
+/** Dashboard del empleado: togglea entre inicio, perfil y control de acceso (sin router). */
 export function HomePage({ empleado, cerrarSesion }) {
   const [vista, setVista] = useState('inicio');
 
