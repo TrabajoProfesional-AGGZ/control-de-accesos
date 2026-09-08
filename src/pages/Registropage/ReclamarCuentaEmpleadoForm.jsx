@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, getIdToken } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { validarEmpleado, reclamarCuentaEmpleado } from '../../services/empleadosService';
+import { asignarTipoClaim } from '../../services/authClaimsService';
 import { MAX_LEN, validarCredencialSegura, validarFortalezaPassword } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 import '../../control-theme.css';
@@ -92,6 +93,13 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
       usuarioCreado = userCredential.user;
 
       await reclamarCuentaEmpleado(legajoLimpio);
+
+      const tokenJWT = await getIdToken(usuarioCreado);
+      try {
+        await asignarTipoClaim(tokenJWT, 'empleado');
+      } catch (claimErr) {
+        console.error('No se pudo asignar el tipo de cuenta:', claimErr);
+      }
 
       setExito(true);
       setTimeout(() => {
