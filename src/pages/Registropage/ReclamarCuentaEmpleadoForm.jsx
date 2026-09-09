@@ -96,7 +96,7 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
 
       const tokenJWT = await getIdToken(usuarioCreado);
       try {
-        await asignarTipoClaim(tokenJWT, 'empleado');
+        await asignarTipoClaim(tokenJWT, 'acceso');
       } catch (claimErr) {
         console.error('No se pudo asignar el tipo de cuenta:', claimErr);
       }

@@ -1,7 +1,7 @@
 import { fetchTo } from '../utils/utils';
 
 /**
- * Setea el claim `tipo:"empleado"` sobre la cuenta identificada por idToken
+ * Setea el claim `tipo:"acceso"` sobre la cuenta identificada por idToken
  * (self-service — ms-auth verifica el token y actúa sobre esa misma cuenta).
  * Idempotente si ya tiene el mismo tipo asignado.
  */
