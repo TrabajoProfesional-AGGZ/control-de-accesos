@@ -87,12 +87,13 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
     setCargando(true);
     let usuarioCreado = null;
     try {
-      await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
+      // El token de un solo uso ata el reclamo de abajo a *esta* validación (issue #249/A-01).
+      const { token } = await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
 
       const userCredential = await createUserWithEmailAndPassword(auth, mailLimpio, password);
       usuarioCreado = userCredential.user;
 
-      await reclamarCuentaEmpleado(legajoLimpio);
+      await reclamarCuentaEmpleado(legajoLimpio, token);
 
       const tokenJWT = await getIdToken(usuarioCreado);
       try {
@@ -119,6 +120,10 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         setError('Este empleado ya tiene una cuenta registrada. Iniciá sesión en su lugar.');
       } else if (err.message === 'empleado-no-encontrado') {
         setError('No pudimos validar tu identidad. Revisá los datos ingresados.');
+      } else if (err.message === 'demasiados-intentos') {
+        setError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
+      } else if (err.message === 'validacion-vencida') {
+        setError('La validación expiró. Volvé a empezar el registro.');
       } else if (err.code === 'auth/email-already-in-use') {
         setError('El email ya está en uso. Por favor, iniciá sesión.');
       } else {
