@@ -33,6 +33,11 @@ describe('empleadosService', () => {
       fetchWithOutAuth.mockResolvedValueOnce({ ok: false, status: 409 });
       await expect(validarEmpleado('1000', 'a@a.com', '111')).rejects.toThrow('cuenta-ya-registrada');
     });
+
+    test('lanza "demasiados-intentos" en 429', async () => {
+      fetchWithOutAuth.mockResolvedValueOnce({ ok: false, status: 429 });
+      await expect(validarEmpleado('1000', 'a@a.com', '111')).rejects.toThrow('demasiados-intentos');
+    });
   });
 
   describe('reclamarCuentaEmpleado', () => {
@@ -42,7 +47,23 @@ describe('empleadosService', () => {
       expect(fetchTo).toHaveBeenCalledWith(
         '/api/v1/empleados/por-legajo/legajo%20con%20espacio/reclamar',
         'POST',
+        null,
       );
+    });
+
+    test('manda el token de validación cuando lo hay', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ cuenta_reclamada: true }) });
+      await reclamarCuentaEmpleado('1000', 'tok-123');
+      expect(fetchTo).toHaveBeenCalledWith(
+        '/api/v1/empleados/por-legajo/1000/reclamar',
+        'POST',
+        { token: 'tok-123' },
+      );
+    });
+
+    test('lanza "validacion-vencida" en 403', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 403 });
+      await expect(reclamarCuentaEmpleado('1000', 'tok-viejo')).rejects.toThrow('validacion-vencida');
     });
 
     test('lanza "cuenta-ya-registrada" en 409', async () => {

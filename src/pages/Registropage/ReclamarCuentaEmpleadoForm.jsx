@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, getIdToken } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { validarEmpleado, reclamarCuentaEmpleado } from '../../services/empleadosService';
+import { asignarTipoClaim } from '../../services/authClaimsService';
 import { MAX_LEN, validarCredencialSegura, validarFortalezaPassword } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 import '../../control-theme.css';
@@ -86,12 +87,20 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
     setCargando(true);
     let usuarioCreado = null;
     try {
-      await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
+      // El token de un solo uso ata el reclamo de abajo a *esta* validación (issue #249/A-01).
+      const { token } = await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
 
       const userCredential = await createUserWithEmailAndPassword(auth, mailLimpio, password);
       usuarioCreado = userCredential.user;
 
-      await reclamarCuentaEmpleado(legajoLimpio);
+      await reclamarCuentaEmpleado(legajoLimpio, token);
+
+      const tokenJWT = await getIdToken(usuarioCreado);
+      try {
+        await asignarTipoClaim(tokenJWT, 'acceso');
+      } catch (claimErr) {
+        console.error('No se pudo asignar el tipo de cuenta:', claimErr);
+      }
 
       setExito(true);
       setTimeout(() => {
@@ -111,6 +120,10 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         setError('Este empleado ya tiene una cuenta registrada. Iniciá sesión en su lugar.');
       } else if (err.message === 'empleado-no-encontrado') {
         setError('No pudimos validar tu identidad. Revisá los datos ingresados.');
+      } else if (err.message === 'demasiados-intentos') {
+        setError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
+      } else if (err.message === 'validacion-vencida') {
+        setError('La validación expiró. Volvé a empezar el registro.');
       } else if (err.code === 'auth/email-already-in-use') {
         setError('El email ya está en uso. Por favor, iniciá sesión.');
       } else {
