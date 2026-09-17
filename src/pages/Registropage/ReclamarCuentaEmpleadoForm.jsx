@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, deleteUser, getIdToken } from 'firebase
 import { auth } from '../../firebase';
 import { validarEmpleado, reclamarCuentaEmpleado } from '../../services/empleadosService';
 import { asignarTipoClaim } from '../../services/authClaimsService';
+import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura, validarFortalezaPassword } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 import '../../control-theme.css';
@@ -44,6 +45,7 @@ function PasswordField({ id, label, value, onChange, autoComplete, error }) {
 
 /** Reclamo de cuenta (legajo + DNI + mail + contraseña) en un solo paso, con Saga de rollback en Firebase. */
 export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
+  const { recargarEmpleado } = useAuth();
   const [legajo, setLegajo] = useState('');
   const [mail, setMail] = useState('');
   const [dni, setDni] = useState('');
@@ -93,14 +95,15 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
       const userCredential = await createUserWithEmailAndPassword(auth, mailLimpio, password);
       usuarioCreado = userCredential.user;
 
-      await reclamarCuentaEmpleado(legajoLimpio, token);
+      // El claim va antes del reclamo: si falla, el catch hace rollback (deleteUser)
+      // sin fila reclamada en la base. Después se refresca el token cacheado para
+      // que las llamadas siguientes (incluida la de recargarEmpleado) ya lo lleven.
+      const tokenPrevioAlClaim = await getIdToken(usuarioCreado);
+      await asignarTipoClaim(tokenPrevioAlClaim, 'acceso');
+      await getIdToken(usuarioCreado, true);
 
-      const tokenJWT = await getIdToken(usuarioCreado);
-      try {
-        await asignarTipoClaim(tokenJWT, 'acceso');
-      } catch (claimErr) {
-        console.error('No se pudo asignar el tipo de cuenta:', claimErr);
-      }
+      await reclamarCuentaEmpleado(legajoLimpio, token);
+      await recargarEmpleado();
 
       setExito(true);
       setTimeout(() => {
