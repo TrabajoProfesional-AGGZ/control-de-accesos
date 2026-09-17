@@ -110,4 +110,41 @@ describe('ReclamarCuentaEmpleadoForm', () => {
     await waitFor(() => expect(mockRecargarEmpleado).toHaveBeenCalled());
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
   });
+
+  test('el botón "Empezar" llama a onSuccess antes de que venza el timeout automático', async () => {
+    jest.useFakeTimers({ legacyFakeTimers: false });
+    const onSuccess = jest.fn();
+    const { unmount } = render(<ReclamarCuentaEmpleadoForm onSuccess={onSuccess} onCancel={() => {}} />);
+    completarFormulario();
+    fireEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Cuenta configurada!')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /empezar/i }));
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    // En la app real, onSuccess navega y desmonta este formulario — lo que dispara
+    // el cleanup que hace clearTimeout. Se simula el desmontaje para verificarlo.
+    unmount();
+    jest.advanceTimersByTime(3000);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+  });
+
+  test('sin tocar "Empezar", onSuccess se llama solo tras 3000ms', async () => {
+    jest.useFakeTimers({ legacyFakeTimers: false });
+    const onSuccess = jest.fn();
+    render(<ReclamarCuentaEmpleadoForm onSuccess={onSuccess} onCancel={() => {}} />);
+    completarFormulario();
+    fireEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Cuenta configurada!')).toBeInTheDocument());
+    expect(onSuccess).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(3000);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+  });
 });

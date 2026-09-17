@@ -57,7 +57,11 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
 
   // Evita setState tras desmontar (el onSuccess de más abajo dispara un setTimeout).
   const montadoRef = useRef(true);
-  useEffect(() => () => { montadoRef.current = false; }, []);
+  const timeoutRef = useRef(null);
+  useEffect(() => () => {
+    montadoRef.current = false;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }, []);
 
   const manejarSubmit = async (e) => {
     e.preventDefault();
@@ -106,9 +110,9 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
       await recargarEmpleado();
 
       setExito(true);
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         if (montadoRef.current) onSuccess();
-      }, 1500);
+      }, 3000);
     } catch (err) {
       // Saga: si el usuario de Firebase se llegó a crear pero el reclamo en el
       // backend falla, se deshace el alta en Firebase para no dejar cuentas huérfanas.
@@ -159,6 +163,9 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
             <div className="csf-success">
               <h2>¡Cuenta configurada!</h2>
               <p>Ya podés empezar a usar la aplicación.</p>
+              <button type="button" className="csf-btn-submit" onClick={onSuccess}>
+                Empezar
+              </button>
             </div>
           ) : (
             <form onSubmit={manejarSubmit}>
