@@ -22,6 +22,7 @@ jest.mock('html5-qrcode', () => {
       this.resume = jest.fn();
       this.stop = jest.fn().mockResolvedValue();
       this.clear = jest.fn();
+      this.getRunningTrackSettings = jest.fn(() => ({ width: 640 }));
     }),
   };
 });
@@ -349,6 +350,46 @@ describe('LectorAcceso', () => {
     expect(screen.getByText('Otro Socio')).toBeInTheDocument();
   });
 
+  test('al volver de segundo plano con el track muerto, reinicia la cámara', async () => {
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+    const scanner = ultimaInstanciaDelScanner();
+    scanner.getRunningTrackSettings.mockReturnValueOnce(null);
+    scanner.start.mockClear();
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(scanner.stop).toHaveBeenCalled();
+    expect(scanner.start).toHaveBeenCalled();
+  });
+
+  test('al volver de segundo plano con el track vivo, no reinicia la cámara', async () => {
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+    const scanner = ultimaInstanciaDelScanner();
+    scanner.start.mockClear();
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(scanner.start).not.toHaveBeenCalled();
+  });
+
   test('error de red: muestra un mensaje genérico', async () => {
     fetchTo.mockRejectedValueOnce(new Error('network error'));
 
@@ -376,7 +417,8 @@ describe('LectorAcceso - Inyección de id_evento', () => {
       start: mockStart,
       pause: mockPause,
       stop: mockStop,
-      clear: mockClear
+      clear: mockClear,
+      getRunningTrackSettings: jest.fn(() => ({ width: 640 }))
     }));
 
     // Mockeamos la respuesta exitosa del backend

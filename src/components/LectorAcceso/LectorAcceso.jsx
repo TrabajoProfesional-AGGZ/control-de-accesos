@@ -3,6 +3,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { CheckCircle2, XCircle, CameraOff } from 'lucide-react';
 import { fetchTo } from '../../utils/utils';
 import { vibrar } from '../../utils/haptics';
+import { useWakeLock } from '../../hooks/useWakeLock';
 import './LectorAcceso.css';
 
 const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero: null };
@@ -57,6 +58,8 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const validandoLentoTimeoutRef = useRef(null);
   const iniciarRef = useRef(null);
   const ultimoQrRef = useRef({ texto: null, hasta: 0 });
+
+  useWakeLock(!errorCamara);
 
   useEffect(() => {
     idEventoRef.current = idEvento;
@@ -121,6 +124,22 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     iniciarRef.current = iniciarCamara;
 
     iniciarCamara();
+
+    function alVolverVisible() {
+      if (document.visibilityState !== 'visible') return;
+      let vivo = false;
+      try {
+        const s = qrCode.getRunningTrackSettings();
+        vivo = Boolean(s && s.width);
+      } catch {
+        // sin track corriendo: se trata como "no vivo" (vivo ya es false)
+      }
+      if (!vivo && !validandoRef.current) {
+        detener();
+        iniciarCamara();
+      }
+    }
+    document.addEventListener('visibilitychange', alVolverVisible);
 
     async function onScanSuccess(decodedText) {
       if (decodedText === ultimoQrRef.current.texto && Date.now() < ultimoQrRef.current.hasta) {
@@ -195,6 +214,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
       clearTimeout(leidoTimeoutRef.current);
       clearTimeout(validandoLentoTimeoutRef.current);
       window.removeEventListener('unhandledrejection', ignorarAbortDePlayInterrumpido);
+      document.removeEventListener('visibilitychange', alVolverVisible);
     };
   }, []);
 
@@ -204,7 +224,8 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     try {
       scannerRef.current?.resume();
     } catch {
-      // no-op si el escáner no llegó a iniciar
+      // el track pudo haberse cerrado mientras el resultado estaba en pantalla (segundo plano)
+      iniciarRef.current?.();
     }
   };
 
