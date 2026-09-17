@@ -48,9 +48,12 @@ describe('LectorAcceso', () => {
     delete navigator.vibrate;
   });
 
-  test('renderiza el contenedor de la cámara', () => {
+  test('renderiza el contenedor de la cámara', async () => {
     render(<LectorAcceso />);
     expect(document.getElementById('qr-reader')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
   });
 
   test('acceso válido: muestra el nombre del socio debajo de la cámara', async () => {
@@ -80,14 +83,20 @@ describe('LectorAcceso', () => {
     expect(scanner.pause).toHaveBeenCalledWith();
   });
 
-  test('muestra el badge "Ingreso normal" sin evento', () => {
+  test('muestra el badge "Ingreso normal" sin evento', async () => {
     render(<LectorAcceso />);
     expect(screen.getByText('Ingreso normal')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
   });
 
-  test('muestra "Entrada · X" con nombreEvento', () => {
+  test('muestra "Entrada · X" con nombreEvento', async () => {
     render(<LectorAcceso idEvento="uuid-del-evento-999" nombreEvento="Partido de Verano" />);
     expect(screen.getByText('Entrada · Partido de Verano')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
   });
 
   test('vibra al decodificar y al mostrar el resultado de éxito', async () => {

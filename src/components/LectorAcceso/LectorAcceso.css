@@ -10,6 +10,8 @@
   position: relative;
   width: 100%;
   max-width: 400px;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-text-primary);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -17,6 +19,7 @@
 
 .lector-camara {
   width: 100%;
+  height: 100%;
 }
 
 .lector-modo {
@@ -58,9 +61,26 @@
   background-color: rgba(17, 17, 17, 0.85);
 }
 
-.lector-overlay--validando {
+.lector-overlay--validando,
+.lector-overlay--iniciando {
   background-color: rgba(17, 17, 17, 0.7);
   font-weight: 600;
+}
+
+/* Copiado de ModalOverlay.css (.csf-spinner) para no acoplar el lector al shell de modales. */
+.csf-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-surface);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  animation: lector-spin 0.8s linear infinite;
+}
+
+@keyframes lector-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .lector-overlay--error {

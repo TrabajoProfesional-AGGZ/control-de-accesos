@@ -18,6 +18,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const [validando, setValidando] = useState(false);
   const [errorCamara, setErrorCamara] = useState(false);
   const [leido, setLeido] = useState(false);
+  const [camaraLista, setCamaraLista] = useState(false);
 
   const scannerRef = useRef(null);
   const validandoRef = useRef(false);
@@ -58,7 +59,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     qrCode
       .start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 4 / 3 },
         onScanSuccess,
         onScanFailure
       )
@@ -66,7 +67,11 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         // en StrictMode (dev) el efecto se monta, limpia y vuelve a montar antes de que
         // .start() resuelva — si ya nos limpiaron para cuando llega acá, hay que frenar
         // la cámara igual (si no, queda un stream de video huérfano).
-        if (cancelado) detener();
+        if (cancelado) {
+          detener();
+        } else {
+          setCamaraLista(true);
+        }
       })
       .catch(() => {
         if (!cancelado) setErrorCamara(true);
@@ -163,6 +168,13 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         >
           {nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso normal'}
         </span>
+
+        {!camaraLista && !errorCamara && (
+          <div className="lector-overlay lector-overlay--iniciando" aria-live="polite">
+            <span className="csf-spinner" aria-hidden="true" />
+            <p>Iniciando cámara…</p>
+          </div>
+        )}
 
         {errorCamara && (
           <div className="lector-overlay lector-overlay--error" role="alert">
