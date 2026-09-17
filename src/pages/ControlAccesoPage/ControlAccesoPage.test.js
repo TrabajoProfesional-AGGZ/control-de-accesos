@@ -21,15 +21,20 @@ function hoyISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** getEventosActivos ahora devuelve { eventos, fechaServidor } (fecha del header HTTP `Date`). */
+function respuestaEventos(eventos) {
+  return { eventos, fechaServidor: new Date() };
+}
+
 describe('ControlAccesoPage - Selección de Eventos', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('carga los eventos y el selector funciona correctamente', async () => {
-    getEventosActivos.mockResolvedValue([
+    getEventosActivos.mockResolvedValue(respuestaEventos([
       { id: 'evento-123', nombre: 'Partido de Verano', dia: hoyISO() }
-    ]);
+    ]));
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);
 
@@ -57,7 +62,7 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
     const chipNormal = screen.getByRole('radio', { name: 'Ingreso normal al club' });
     expect(chipNormal).not.toBeDisabled();
 
-    resolverEventos([]);
+    resolverEventos(respuestaEventos([]));
     await waitFor(() => expect(getEventosActivos).toHaveBeenCalled());
   });
 
@@ -86,7 +91,7 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
     await screen.findByText('No se pudieron cargar los eventos de hoy.');
     expect(getEventosActivos).toHaveBeenCalledTimes(1);
 
-    getEventosActivos.mockResolvedValueOnce([]);
+    getEventosActivos.mockResolvedValueOnce(respuestaEventos([]));
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
 
     await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(2));
@@ -94,10 +99,10 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
   });
 
   test('solo muestra en el selector eventos del día de hoy', async () => {
-    getEventosActivos.mockResolvedValue([
+    getEventosActivos.mockResolvedValue(respuestaEventos([
       { id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() },
       { id: 'evento-futuro', nombre: 'Torneo del mes que viene', dia: '2099-01-01' },
-    ]);
+    ]));
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);
 
@@ -117,7 +122,7 @@ describe('ControlAccesoPage - Refresco de eventos en segundo plano (W5)', () => 
 
   test('refetchea cada 5 minutos mientras la vista está montada', async () => {
     jest.useFakeTimers();
-    getEventosActivos.mockResolvedValue([]);
+    getEventosActivos.mockResolvedValue(respuestaEventos([]));
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);
     await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(1));
@@ -127,7 +132,7 @@ describe('ControlAccesoPage - Refresco de eventos en segundo plano (W5)', () => 
   });
 
   test('refetchea al volver a visible', async () => {
-    getEventosActivos.mockResolvedValue([]);
+    getEventosActivos.mockResolvedValue(respuestaEventos([]));
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);
     await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(1));
@@ -144,7 +149,7 @@ describe('ControlAccesoPage - Refresco de eventos en segundo plano (W5)', () => 
   test('un refetch silencioso fallido no muestra el aviso de error ni vacía la lista', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     getEventosActivos
-      .mockResolvedValueOnce([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }])
+      .mockResolvedValueOnce(respuestaEventos([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }]))
       .mockRejectedValueOnce(new Error('network error'));
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);
@@ -163,8 +168,8 @@ describe('ControlAccesoPage - Refresco de eventos en segundo plano (W5)', () => 
 
   test('si el evento elegido desaparece del refetch, vuelve a "Ingreso normal al club"', async () => {
     getEventosActivos
-      .mockResolvedValueOnce([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }])
-      .mockResolvedValueOnce([]);
+      .mockResolvedValueOnce(respuestaEventos([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }]))
+      .mockResolvedValueOnce(respuestaEventos([]));
     Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
 
     render(<ControlAccesoPage onVolver={jest.fn()} />);

@@ -6,9 +6,14 @@ import { getEventosActivos } from '../../services/eventosService';
 import { vibrar } from '../../utils/haptics';
 import { desbloquearAudio } from '../../utils/sonidos';
 
-/** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
-function hoyISO() {
-  const hoy = new Date();
+/**
+ * Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. Recibe la fecha del
+ * servidor (header `Date` de la respuesta de `getEventosActivos`) en vez de usar `new Date()`
+ * a secas: una tablet con el reloj/huso horario mal configurado mostraría los eventos del
+ * día equivocado si se confiara en el reloj del dispositivo.
+ */
+function hoyISO(fecha) {
+  const hoy = fecha ?? new Date();
   const yyyy = hoy.getFullYear();
   const mm = String(hoy.getMonth() + 1).padStart(2, '0');
   const dd = String(hoy.getDate()).padStart(2, '0');
@@ -31,10 +36,10 @@ export function ControlAccesoPage({ onVolver }) {
         setCargandoEventos(true);
         setErrorEventos(false);
       }
-      const data = await getEventosActivos();
+      const { eventos: data, fechaServidor } = await getEventosActivos();
       // GET /api/v1/eventos ya excluye eventos vencidos, pero puede seguir trayendo eventos
       // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
-      const deHoy = data.filter((evento) => evento.dia === hoyISO());
+      const deHoy = data.filter((evento) => evento.dia === hoyISO(fechaServidor));
       setEventos(deHoy);
       setEventoSeleccionado((actual) => {
         if (actual && !deHoy.some((evento) => evento.id === actual)) {
