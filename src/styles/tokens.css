@@ -2,9 +2,16 @@
 :root {
   color-scheme: light;
 
+  /* Tamaño base para el cálculo de rem (16px default del navegador).
+     115% = fuentes ~15% más grandes en toda la app sin tocar cada
+     declaración individual — todo font-size del proyecto está en rem. */
+  font-size: 115%;
+
   /* Colors */
   --color-text-primary: #111111;
   --color-text-secondary: #4a4a4a;
+  /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
+  --color-text-placeholder: #707070;
   --color-bg: #f5f5f5;
   --color-surface: #ffffff;
   --color-border: #e8e8e8;
@@ -16,6 +23,12 @@
   --color-row-hover: #f8f8f8;
   --color-bg-subtle: #f0f0f0;
   --color-overlay: rgba(0, 0, 0, 0.4);
+  /* Scrim de modales (material sobre el contenido). */
+  --color-scrim: rgba(0, 0, 0, 0.38);
+  --scrim-blur: blur(4px);
+  /* Material translúcido del header. Tope de blur 12px (Android de gama baja); el header ya está en 10px. */
+  --material-header-bg: rgba(255, 255, 255, 0.88);
+  --material-blur: blur(10px);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) */
   --color-on-accent: #ffffff;
@@ -63,6 +76,9 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
 
   /* Z-index scale */
   --z-dropdown: 100;
@@ -76,4 +92,27 @@
   /* Typography */
   --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Escala tipográfica: tamaño / leading / tracking apareados. Espejo de aplicacion. */
+  --text-display: 2rem;     --leading-display: 1.05; --tracking-display: -0.03em;
+  --text-title: 1.65rem;    --leading-title: 1.15;   --tracking-title: -0.02em;
+  --text-heading: 1.15rem;  --leading-heading: 1.25; --tracking-heading: -0.01em;
+  --text-body: 1rem;        --leading-body: 1.5;     --tracking-body: 0;
+  --text-secondary: 0.875rem; --leading-secondary: 1.45; --tracking-secondary: 0;
+  --text-caption: 0.78rem;  --leading-caption: 1.4;  --tracking-caption: 0.01em;
+  --text-label: 0.7rem;     --leading-label: 1.2;    --tracking-label: 0.06em;
+  --text-micro: 0.65rem;    --leading-micro: 1.2;    --tracking-micro: 0.04em;
+}
+
+/* Preferencias de accesibilidad del sistema operativo. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --scrim-blur: none;
+    --color-scrim: rgba(0, 0, 0, 0.55);
+    --material-header-bg: #ffffff;
+    --material-blur: none;
+  }
+}
+@media (prefers-contrast: more) {
+  :root { --color-border: #9a9a9a; --color-border-medium: #7a7a7a; --color-border-light: #b0b0b0; --color-text-secondary: #2e2e2e; --color-text-placeholder: #4a4a4a; }
 }

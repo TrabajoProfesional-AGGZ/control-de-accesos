@@ -29,7 +29,7 @@
   justify-content: center;
   background-color: var(--color-text-primary);
   color: var(--color-surface);
-  font-size: 1.1rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -43,7 +43,7 @@
 
 .perfil-card-nombre {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -87,12 +87,12 @@
 }
 
 .perfil-dato-label {
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
 .perfil-dato-valor {
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -109,13 +109,15 @@
   padding: var(--space-4);
   font: inherit;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   cursor: pointer;
   transition: background-color var(--transition-normal);
 }
 
-.perfil-cambiar-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .perfil-cambiar-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .perfil-cambiar-button:active {
@@ -127,7 +129,7 @@
 }
 
 .perfil-password-wrapper .csf-input {
-  padding-right: 44px;
+  padding-right: 52px;
 }
 
 .perfil-toggle-password {
@@ -144,6 +146,14 @@
   align-items: center;
 }
 
+/* .hit-area (index.css) fuerza position:relative para su ::before; acá el
+   botón necesita quedar position:absolute para su propio posicionamiento.
+   Dos clases > una clase en especificidad, gana esta sin importar el orden
+   de carga de las hojas de estilo. */
+.perfil-toggle-password.hit-area {
+  position: absolute;
+}
+
 .perfil-cerrar-sesion {
   width: 100%;
   box-sizing: border-box;
@@ -158,14 +168,16 @@
   color: var(--color-danger);
   font: inherit;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   cursor: pointer;
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
-.perfil-cerrar-sesion:hover {
-  background-color: var(--status-error-surface-bg);
-  border-color: var(--status-danger-border);
+@media (hover: hover) {
+  .perfil-cerrar-sesion:hover {
+    background-color: var(--status-error-surface-bg);
+    border-color: var(--status-danger-border);
+  }
 }
 
 .perfil-cerrar-sesion:active {

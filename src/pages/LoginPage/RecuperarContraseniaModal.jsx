@@ -51,7 +51,7 @@ export function RecuperarContraseniaModal({ onClose }) {
         <div className="csf-card">
           {enviado ? (
             <div className="csf-success">
-              <p style={{ fontSize: '1.15rem' }}>
+              <p className="csf-success-texto">
                 Si el email o legajo ingresado tiene una cuenta, te enviamos un mail para
                 restablecer tu contraseña. Si no lo encontrás, revisá la casilla de SPAM.
               </p>
@@ -74,6 +74,8 @@ export function RecuperarContraseniaModal({ onClose }) {
                     onChange={(e) => setIdentificador(e.target.value)}
                     maxLength={MAX_LEN.EMAIL}
                     required
+                    autoComplete="username"
+                    autoCapitalize="none"
                   />
                   {error && <p className="csf-error">{error}</p>}
                 </div>

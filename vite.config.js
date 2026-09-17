@@ -16,7 +16,7 @@ export default defineConfig({
         name: 'SocioUnido - Control de Acceso',
         short_name: 'Control Acceso',
         description: 'Aplicación para empleados del club: control de acceso, reservas e inscripciones de socios',
-        theme_color: '#111111',
+        theme_color: '#f5f5f5',
         background_color: '#111111',
         display: 'standalone',
         icons: [

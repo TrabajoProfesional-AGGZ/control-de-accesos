@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Hash, IdCard, Mail, Lock, Eye, EyeOff, AlertCircle, LogOut } from 'lucide-react';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useCambiarContrasenia } from '../../hooks/useCambiarContrasenia';
@@ -28,7 +29,7 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
       />
       <button
         type="button"
-        className="perfil-toggle-password"
+        className="perfil-toggle-password hit-area"
         onClick={() => setMostrar((v) => !v)}
         aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
       >
@@ -169,9 +170,11 @@ export function PerfilPage({ empleado, cerrarSesion }) {
         Cerrar sesión
       </button>
 
-      {modalAbierto && (
-        <CambiarContraseniaModal cerrarSesion={cerrarSesion} onClose={() => setModalAbierto(false)} />
-      )}
+      <AnimatePresence>
+        {modalAbierto && (
+          <CambiarContraseniaModal cerrarSesion={cerrarSesion} onClose={() => setModalAbierto(false)} />
+        )}
+      </AnimatePresence>
     </>
   );
 }
