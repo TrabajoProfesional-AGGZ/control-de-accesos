@@ -4,6 +4,7 @@ import './ControlAccesoPage.css';
 import { useState, useEffect, useCallback } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
 import { vibrar } from '../../utils/haptics';
+import { desbloquearAudio } from '../../utils/sonidos';
 
 /** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
 function hoyISO() {
@@ -55,6 +56,14 @@ export function ControlAccesoPage({ onVolver }) {
   useEffect(() => {
     fetchEventos();
   }, [fetchEventos]);
+
+  // Respaldo por si algún día se aterriza directo en la cámara (R4) o la sesión se restaura
+  // acá: el toque de "Escanear QR de socio" en HomePage ya desbloquea el audio, pero tocar
+  // un chip de modo también cuenta como gesto de usuario.
+  useEffect(() => {
+    document.addEventListener('pointerdown', desbloquearAudio, { once: true });
+    return () => document.removeEventListener('pointerdown', desbloquearAudio);
+  }, []);
 
   // Refresco en segundo plano: una tablet fija en el puesto queda horas en esta vista.
   useEffect(() => {

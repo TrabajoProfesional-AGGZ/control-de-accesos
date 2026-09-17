@@ -1,11 +1,19 @@
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { LectorAcceso } from './LectorAcceso';
 import { fetchTo } from '../../utils/utils';
+import { sonarResultado, suscribirAudioDisponible } from '../../utils/sonidos';
 import { Html5Qrcode } from 'html5-qrcode';
 
 jest.mock('html5-qrcode');
 jest.mock('../../utils/utils', () => ({
   fetchTo: jest.fn(),
+}));
+jest.mock('../../utils/sonidos', () => ({
+  sonarResultado: jest.fn(),
+  suscribirAudioDisponible: jest.fn((callback) => {
+    callback(true);
+    return () => {};
+  }),
 }));
 
 jest.mock('html5-qrcode', () => {
@@ -42,6 +50,8 @@ async function simularEscaneo(qrData) {
 describe('LectorAcceso', () => {
   beforeEach(() => {
     fetchTo.mockClear();
+    sonarResultado.mockClear();
+    localStorage.clear();
     Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
   });
 
@@ -188,6 +198,48 @@ describe('LectorAcceso', () => {
 
     expect(navigator.vibrate).toHaveBeenCalledWith(15);
     expect(navigator.vibrate).toHaveBeenCalledWith(40);
+    expect(sonarResultado).toHaveBeenCalledWith(true);
+  });
+
+  test('suena el zumbido de rechazo en un acceso inválido', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        detail: { mensaje: 'Código QR inválido o expirado', nombre: 'Juan Pérez', estado_financiero: 'Moroso' },
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|000000');
+
+    expect(sonarResultado).toHaveBeenCalledWith(false);
+  });
+
+  test('muestra el botón de silencio si hay audio disponible y lo alterna al tocarlo', async () => {
+    render(<LectorAcceso />);
+
+    const boton = await screen.findByRole('button', { name: 'Silenciar sonido' });
+    fireEvent.click(boton);
+
+    expect(await screen.findByRole('button', { name: 'Activar sonido' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(localStorage.getItem('sonido_escaneo')).toBe('off');
+  });
+
+  test('no muestra el botón de silencio si no hay audio disponible', async () => {
+    suscribirAudioDisponible.mockImplementationOnce((callback) => {
+      callback(false);
+      return () => {};
+    });
+
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+
+    expect(screen.queryByRole('button', { name: 'Silenciar sonido' })).not.toBeInTheDocument();
   });
 
   test('acceso inválido: muestra nombre y estado financiero como motivo', async () => {

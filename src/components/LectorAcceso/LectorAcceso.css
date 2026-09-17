@@ -226,7 +226,29 @@
   transform: scale(0.96);
 }
 
-/* html5-qrcode inyecta un "Scanner paused" en cada pause(). 
+.lector-silencio {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: none;
+  background-color: rgba(17, 17, 17, 0.7);
+  color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lector-silencio[aria-pressed="true"] {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* html5-qrcode inyecta un "Scanner paused" en cada pause().
    !important le gana al inline.
    El único otro <div> hijo directo es #qr-shaded-region (la guía). */
 #qr-reader > div:not(#qr-shaded-region) {

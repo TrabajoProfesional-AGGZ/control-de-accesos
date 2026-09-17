@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { CheckCircle2, XCircle, CameraOff } from 'lucide-react';
+import { CheckCircle2, XCircle, CameraOff, Volume2, VolumeX } from 'lucide-react';
 import { fetchTo } from '../../utils/utils';
 import { vibrar } from '../../utils/haptics';
+import { sonarResultado, suscribirAudioDisponible } from '../../utils/sonidos';
 import { useWakeLock } from '../../hooks/useWakeLock';
 import './LectorAcceso.css';
 
@@ -50,6 +51,10 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const [errorCamara, setErrorCamara] = useState(null);
   const [leido, setLeido] = useState(false);
   const [camaraLista, setCamaraLista] = useState(false);
+  const [audioDisponible, setAudioDisponible] = useState(false);
+  const [silenciado, setSilenciado] = useState(
+    () => typeof localStorage !== 'undefined' && localStorage.getItem('sonido_escaneo') === 'off'
+  );
 
   const scannerRef = useRef(null);
   const validandoRef = useRef(false);
@@ -60,6 +65,8 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const ultimoQrRef = useRef({ texto: null, hasta: 0 });
 
   useWakeLock(!errorCamara);
+
+  useEffect(() => suscribirAudioDisponible(setAudioDisponible), []);
 
   useEffect(() => {
     idEventoRef.current = idEvento;
@@ -169,6 +176,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
 
         if (res.ok) {
           vibrar(40);
+          sonarResultado(true);
           setResultado({
             tipo: 'exito',
             mensaje: 'Acceso permitido',
@@ -179,6 +187,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
           const detalle = data.detail;
           const esDetalleEstructurado = detalle && typeof detalle === 'object';
           vibrar([40, 60, 40, 60, 40]);
+          sonarResultado(false);
           setResultado({
             tipo: 'error',
             mensaje: esDetalleEstructurado
@@ -190,6 +199,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         }
       } catch {
         vibrar([40, 60, 40, 60, 40]);
+        sonarResultado(false);
         setResultado({
           tipo: 'error',
           mensaje: 'Error procesando el código.',
@@ -231,6 +241,12 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
 
   const eyebrow = nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso al club';
 
+  function alternarSilencio() {
+    const siguiente = !silenciado;
+    setSilenciado(siguiente);
+    localStorage.setItem('sonido_escaneo', siguiente ? 'off' : 'on');
+  }
+
   return (
     <div className="lector-container">
       <div className="lector-camara-wrapper">
@@ -242,6 +258,18 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         >
           {nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso normal'}
         </span>
+
+        {audioDisponible && camaraLista && !resultado.tipo && (
+          <button
+            type="button"
+            className="lector-silencio"
+            aria-pressed={silenciado}
+            aria-label={silenciado ? 'Activar sonido' : 'Silenciar sonido'}
+            onClick={alternarSilencio}
+          >
+            {silenciado ? <VolumeX size={22} /> : <Volume2 size={22} />}
+          </button>
+        )}
 
         {!camaraLista && !errorCamara && (
           <div className="lector-overlay lector-overlay--iniciando" aria-live="polite">

@@ -4,6 +4,7 @@ import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { PerfilPage } from '../PerfilPage/PerfilPage';
 import { ControlAccesoPage } from '../ControlAccesoPage/ControlAccesoPage';
+import { desbloquearAudio } from '../../utils/sonidos';
 import '../../control-theme.css';
 import './HomePage.css';
 
@@ -32,7 +33,10 @@ export function HomePage({ empleado, cerrarSesion }) {
 
             <div className="main-action-container">
               <button
-                onClick={() => setVista('control-acceso')}
+                onClick={() => {
+                  desbloquearAudio();
+                  setVista('control-acceso');
+                }}
                 className="btn-escanear-principal"
               >
                 <QrCode size={48} strokeWidth={1.75} />
