@@ -74,6 +74,8 @@ export function RecuperarContraseniaModal({ onClose }) {
                     onChange={(e) => setIdentificador(e.target.value)}
                     maxLength={MAX_LEN.EMAIL}
                     required
+                    autoComplete="username"
+                    autoCapitalize="none"
                   />
                   {error && <p className="csf-error">{error}</p>}
                 </div>

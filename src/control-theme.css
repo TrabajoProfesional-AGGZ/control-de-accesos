@@ -54,7 +54,7 @@ body {
   text-align: center;
   color: var(--color-text-secondary);
   font-size: 1.1rem;
-  margin-top: 7rem;
+  margin-top: 9rem;
   margin-bottom: 3rem;
   font-weight: 400;
 }
@@ -63,7 +63,7 @@ body {
   .login-slogan {
     /* En mobile la banda del logo ocupa proporcionalmente más alto, así que
        el mismo margen fijo que en desktop deja el texto pegado a la banda. */
-    margin-top: 9.5rem;
+    margin-top: 12rem;
   }
 }
 
@@ -94,6 +94,14 @@ body {
   padding: 0;
   display: flex;
   align-items: center;
+}
+
+/* .hit-area (index.css) fuerza position:relative para su ::before; acá el
+   botón necesita quedar position:absolute para su propio posicionamiento.
+   Dos clases > una clase en especificidad, gana esta sin importar el orden
+   de carga de las hojas de estilo. */
+.login-toggle-password.hit-area {
+  position: absolute;
 }
 
 .login-forgot-wrapper {

@@ -146,6 +146,14 @@
   align-items: center;
 }
 
+/* .hit-area (index.css) fuerza position:relative para su ::before; acá el
+   botón necesita quedar position:absolute para su propio posicionamiento.
+   Dos clases > una clase en especificidad, gana esta sin importar el orden
+   de carga de las hojas de estilo. */
+.perfil-toggle-password.hit-area {
+  position: absolute;
+}
+
 .perfil-cerrar-sesion {
   width: 100%;
   box-sizing: border-box;

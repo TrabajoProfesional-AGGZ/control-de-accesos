@@ -186,6 +186,11 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
               value={identificador}
               onChange={(e) => setIdentificador(e.target.value)}
               className="su-input"
+              autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="next"
             />
           </div>
 
@@ -200,6 +205,8 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="su-input"
+                autoComplete="current-password"
+                enterKeyHint="go"
               />
               <button
                 type="button"

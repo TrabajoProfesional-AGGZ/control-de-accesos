@@ -173,6 +173,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setLegajo(e.target.value)}
                     maxLength={MAX_LEN.LEGAJO}
                     required
+                    inputMode="numeric"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="csf-field">
@@ -185,6 +187,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setDni(e.target.value)}
                     maxLength={MAX_LEN.DNI}
                     required
+                    inputMode="numeric"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="csf-field">
@@ -197,6 +201,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setMail(e.target.value)}
                     maxLength={MAX_LEN.EMAIL}
                     required
+                    autoComplete="email"
+                    autoCapitalize="none"
                   />
                 </div>
                 <PasswordField
