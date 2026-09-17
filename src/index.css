@@ -4,6 +4,10 @@ html {
   scroll-behavior: smooth;
 }
 
+html, body {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -30,12 +34,18 @@ button:active:not(:disabled) {
   outline-offset: 2px;
 }
 
+/* Área de toque mínima: 48px cubre Material (48dp) y HIG (44pt). Los
+   íconos chicos amplían la zona sensible sin cambiar el dibujo. */
+button, [role="button"] { min-height: 48px; }
+.hit-area { position: relative; }
+.hit-area::before { content: ''; position: absolute; inset: -12px; }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  *,
+  *:not(.lector-resultado),
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
@@ -43,4 +53,15 @@ button:active:not(:disabled) {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* El resultado del escaneo sigue animando (fade, sin el scale de F4): sin esto
+     el veredicto aparece/desaparece sin transición perceptible entre escaneos. */
+  .lector-resultado {
+    animation: lector-resultado-fade 0.15s linear;
+  }
+}
+
+@keyframes lector-resultado-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

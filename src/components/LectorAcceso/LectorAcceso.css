@@ -10,6 +10,8 @@
   position: relative;
   width: 100%;
   max-width: 400px;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-text-primary);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -17,12 +19,37 @@
 
 .lector-camara {
   width: 100%;
+  height: 100%;
+}
+
+.lector-modo {
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  max-width: calc(100% - 2 * var(--space-4));
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background-color: rgba(17, 17, 17, 0.7);
+  color: var(--color-surface);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.15s var(--ease-out);
+}
+
+.lector-modo--evento {
+  background-color: var(--status-warning-border);
 }
 
 .lector-overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,9 +61,33 @@
   background-color: rgba(17, 17, 17, 0.85);
 }
 
-.lector-overlay--validando {
+.lector-overlay--validando,
+.lector-overlay--iniciando {
   background-color: rgba(17, 17, 17, 0.7);
   font-weight: 600;
+}
+
+.lector-overlay-secundario {
+  margin: 0;
+  font-size: var(--text-secondary);
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* Copiado de ModalOverlay.css (.csf-spinner) para no acoplar el lector al shell de modales. */
+.csf-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-surface);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+  animation: lector-spin 0.8s linear infinite;
+}
+
+@keyframes lector-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .lector-overlay--error {
@@ -49,40 +100,77 @@
 
 .lector-overlay-mensaje {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: var(--text-heading);
   font-weight: 700;
 }
 
 .lector-overlay-nombre {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
-.lector-resultado {
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-6) var(--space-5);
-  border-radius: var(--radius-lg);
-  text-align: center;
+.lector-reintentar {
+  margin-top: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-full);
+  background-color: transparent;
   color: var(--color-surface);
-  box-shadow: var(--shadow-md);
-  animation: lector-resultado-entrada var(--transition-normal) ease-out;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lector-reintentar:active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.lector-resultado {
+  justify-content: flex-start;
+  padding: var(--space-5) var(--space-5) 0;
+  cursor: pointer;
+  animation: lector-resultado-entrada 0.25s var(--ease-out);
 }
 
 @keyframes lector-resultado-entrada {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
+}
+
+/* Las 8 esquinas de la guía que dibuja html5-qrcode son <div> hijos de
+   #qr-shaded-region con background blanco inline. */
+#qr-shaded-region > div {
+  transition: background-color 0.15s var(--ease-out);
+}
+
+.lector-camara--leido #qr-shaded-region > div {
+  background-color: var(--status-success-bg) !important;
+}
+
+/* Jerarquía a un brazo de distancia: eyebrow (modo) < veredicto < nombre (lo más
+   grande de la pantalla) < mensaje/estado financiero. */
+.lector-resultado-eyebrow {
+  margin: 0;
+  font-size: var(--text-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.lector-resultado-veredicto {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .lector-resultado--exito {
@@ -97,31 +185,37 @@
   flex-shrink: 0;
 }
 
-.lector-resultado-mensaje {
-  margin: 0;
-  font-size: 1.15rem;
+.lector-resultado-nombre {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-display);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   font-weight: 700;
+  text-wrap: balance;
 }
 
-.lector-resultado-nombre {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+.lector-resultado-mensaje {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-body);
+  line-height: 1.4;
 }
 
 .lector-resultado-estado-financiero {
-  margin: 0;
-  font-size: 0.9rem;
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-secondary);
   opacity: 0.9;
 }
 
 .lector-resultado-ok {
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-8);
+  margin-top: auto;
+  width: calc(100% + 2 * var(--space-5));
+  margin-left: calc(-1 * var(--space-5));
+  min-height: 56px;
+  border-radius: 0;
   border: none;
-  border-radius: var(--radius-full);
   background-color: var(--color-surface);
   color: var(--color-text-primary);
+  font-size: var(--text-heading);
   font-weight: 700;
   cursor: pointer;
   transition: transform var(--transition-fast);
@@ -129,4 +223,33 @@
 
 .lector-resultado-ok:active {
   transform: scale(0.96);
+}
+
+.lector-silencio {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: none;
+  background-color: rgba(17, 17, 17, 0.7);
+  color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lector-silencio[aria-pressed="true"] {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+/* html5-qrcode inyecta un "Scanner paused" en cada pause().
+   !important le gana al inline.
+   El único otro <div> hijo directo es #qr-shaded-region (la guía). */
+#qr-reader > div:not(#qr-shaded-region) {
+  display: none !important;
 }

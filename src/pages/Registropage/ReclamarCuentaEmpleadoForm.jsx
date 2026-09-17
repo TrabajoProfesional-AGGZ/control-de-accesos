@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, getIdToken } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { validarEmpleado, reclamarCuentaEmpleado } from '../../services/empleadosService';
+import { asignarTipoClaim } from '../../services/authClaimsService';
+import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura, validarFortalezaPassword } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 import '../../control-theme.css';
@@ -29,7 +31,7 @@ function PasswordField({ id, label, value, onChange, autoComplete, error }) {
         />
         <button
           type="button"
-          className="login-toggle-password"
+          className="login-toggle-password hit-area"
           onClick={() => setMostrar((v) => !v)}
           aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
@@ -43,6 +45,7 @@ function PasswordField({ id, label, value, onChange, autoComplete, error }) {
 
 /** Reclamo de cuenta (legajo + DNI + mail + contraseña) en un solo paso, con Saga de rollback en Firebase. */
 export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
+  const { recargarEmpleado } = useAuth();
   const [legajo, setLegajo] = useState('');
   const [mail, setMail] = useState('');
   const [dni, setDni] = useState('');
@@ -54,7 +57,11 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
 
   // Evita setState tras desmontar (el onSuccess de más abajo dispara un setTimeout).
   const montadoRef = useRef(true);
-  useEffect(() => () => { montadoRef.current = false; }, []);
+  const timeoutRef = useRef(null);
+  useEffect(() => () => {
+    montadoRef.current = false;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }, []);
 
   const manejarSubmit = async (e) => {
     e.preventDefault();
@@ -86,17 +93,26 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
     setCargando(true);
     let usuarioCreado = null;
     try {
-      await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
+      // El token de un solo uso ata el reclamo de abajo a *esta* validación (issue #249/A-01).
+      const { token } = await validarEmpleado(legajoLimpio, mailLimpio, dniLimpio);
 
       const userCredential = await createUserWithEmailAndPassword(auth, mailLimpio, password);
       usuarioCreado = userCredential.user;
 
-      await reclamarCuentaEmpleado(legajoLimpio);
+      // El claim va antes del reclamo: si falla, el catch hace rollback (deleteUser)
+      // sin fila reclamada en la base. Después se refresca el token cacheado para
+      // que las llamadas siguientes (incluida la de recargarEmpleado) ya lo lleven.
+      const tokenPrevioAlClaim = await getIdToken(usuarioCreado);
+      await asignarTipoClaim(tokenPrevioAlClaim, 'acceso');
+      await getIdToken(usuarioCreado, true);
+
+      await reclamarCuentaEmpleado(legajoLimpio, token);
+      await recargarEmpleado();
 
       setExito(true);
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         if (montadoRef.current) onSuccess();
-      }, 1500);
+      }, 3000);
     } catch (err) {
       // Saga: si el usuario de Firebase se llegó a crear pero el reclamo en el
       // backend falla, se deshace el alta en Firebase para no dejar cuentas huérfanas.
@@ -111,6 +127,10 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         setError('Este empleado ya tiene una cuenta registrada. Iniciá sesión en su lugar.');
       } else if (err.message === 'empleado-no-encontrado') {
         setError('No pudimos validar tu identidad. Revisá los datos ingresados.');
+      } else if (err.message === 'demasiados-intentos') {
+        setError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
+      } else if (err.message === 'validacion-vencida') {
+        setError('La validación expiró. Volvé a empezar el registro.');
       } else if (err.code === 'auth/email-already-in-use') {
         setError('El email ya está en uso. Por favor, iniciá sesión.');
       } else {
@@ -143,6 +163,9 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
             <div className="csf-success">
               <h2>¡Cuenta configurada!</h2>
               <p>Ya podés empezar a usar la aplicación.</p>
+              <button type="button" className="csf-btn-submit" onClick={onSuccess}>
+                Empezar
+              </button>
             </div>
           ) : (
             <form onSubmit={manejarSubmit}>
@@ -157,6 +180,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setLegajo(e.target.value)}
                     maxLength={MAX_LEN.LEGAJO}
                     required
+                    inputMode="numeric"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="csf-field">
@@ -169,6 +194,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setDni(e.target.value)}
                     maxLength={MAX_LEN.DNI}
                     required
+                    inputMode="numeric"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="csf-field">
@@ -181,6 +208,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
                     onChange={(e) => setMail(e.target.value)}
                     maxLength={MAX_LEN.EMAIL}
                     required
+                    autoComplete="email"
+                    autoCapitalize="none"
                   />
                 </div>
                 <PasswordField

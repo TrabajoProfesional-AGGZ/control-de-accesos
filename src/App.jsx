@@ -20,7 +20,7 @@ export default function App() {
   const mostrarDashboard = vista === 'app' && Boolean(empleado);
 
   if (cargandoAuth) {
-    return <div style={{ height: '100dvh', backgroundColor: '#111111' }} />;
+    return <div style={{ minHeight: '100vh', height: '100dvh', backgroundColor: '#111111' }} />;
   }
 
   if (!mostrarDashboard) {

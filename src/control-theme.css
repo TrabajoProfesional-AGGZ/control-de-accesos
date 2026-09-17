@@ -6,10 +6,37 @@ body {
   color: var(--color-text-primary);
 }
 
+/* Banner oscuro compartido por WelcomeCard y ControlAccesoPage. 
+   Los hex del gradiente son los que la rama demo retunea por club
+  ahora viven en un solo lugar. */
+.banner-oscuro {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 140% at 12% -10%, #4a1a2b 0%, transparent 55%),
+    radial-gradient(120% 140% at 88% 110%, #4a1a2b 0%, transparent 55%),
+    linear-gradient(155deg, #230d15 0%, #14070c 42%, #100408 100%);
+  color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.banner-oscuro-textura {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url('./assets/grain.png');
+}
+
 /* ================= LOGIN ================= */
 .login-container {
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -68,8 +95,8 @@ body {
   font-style: italic;
   text-align: center;
   color: var(--color-text-secondary);
-  font-size: 1.1rem;
-  margin-top: 7rem;
+  font-size: var(--text-heading);
+  margin-top: 9rem;
   margin-bottom: 3rem;
   font-weight: 400;
 }
@@ -78,13 +105,13 @@ body {
   .login-slogan {
     /* En mobile la banda del logo ocupa proporcionalmente más alto, así que
        el mismo margen fijo que en desktop deja el texto pegado a la banda. */
-    margin-top: 9.5rem;
+    margin-top: 12rem;
   }
 }
 
 .login-error {
   color: var(--color-danger);
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   margin: 0 0 var(--space-6) 0;
   text-align: center;
 }
@@ -94,7 +121,7 @@ body {
 }
 
 .login-password-wrapper .su-input {
-  padding-right: 44px;
+  padding-right: 52px;
 }
 
 .login-toggle-password {
@@ -111,6 +138,14 @@ body {
   align-items: center;
 }
 
+/* .hit-area (index.css) fuerza position:relative para su ::before; acá el
+   botón necesita quedar position:absolute para su propio posicionamiento.
+   Dos clases > una clase en especificidad, gana esta sin importar el orden
+   de carga de las hojas de estilo. */
+.login-toggle-password.hit-area {
+  position: absolute;
+}
+
 .login-forgot-wrapper {
   text-align: right;
   margin-top: calc(-1 * var(--space-4));
@@ -123,7 +158,7 @@ body {
   color: var(--color-text-secondary);
   text-decoration: underline;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   padding: 0;
 }
 
@@ -134,7 +169,7 @@ body {
 .login-registro-link {
   text-align: center;
   margin-top: var(--space-8);
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
 }
 
 .login-link-btn {
@@ -153,7 +188,7 @@ body {
 }
 
 .input-label {
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
@@ -162,7 +197,7 @@ body {
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
@@ -180,14 +215,16 @@ body {
   color: var(--color-on-accent);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
-.su-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .su-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .su-button:active:not(:disabled) {

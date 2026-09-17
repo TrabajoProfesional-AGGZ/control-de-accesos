@@ -1,11 +1,19 @@
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { LectorAcceso } from './LectorAcceso';
 import { fetchTo } from '../../utils/utils';
+import { sonarResultado, suscribirAudioDisponible } from '../../utils/sonidos';
 import { Html5Qrcode } from 'html5-qrcode';
 
 jest.mock('html5-qrcode');
 jest.mock('../../utils/utils', () => ({
   fetchTo: jest.fn(),
+}));
+jest.mock('../../utils/sonidos', () => ({
+  sonarResultado: jest.fn(),
+  suscribirAudioDisponible: jest.fn((callback) => {
+    callback(true);
+    return () => {};
+  }),
 }));
 
 jest.mock('html5-qrcode', () => {
@@ -22,6 +30,7 @@ jest.mock('html5-qrcode', () => {
       this.resume = jest.fn();
       this.stop = jest.fn().mockResolvedValue();
       this.clear = jest.fn();
+      this.getRunningTrackSettings = jest.fn(() => ({ width: 640 }));
     }),
   };
 });
@@ -41,11 +50,92 @@ async function simularEscaneo(qrData) {
 describe('LectorAcceso', () => {
   beforeEach(() => {
     fetchTo.mockClear();
+    sonarResultado.mockClear();
+    localStorage.clear();
+    Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
   });
 
-  test('renderiza el contenedor de la cámara', () => {
+  afterEach(() => {
+    delete navigator.vibrate;
+  });
+
+  test('renderiza el contenedor de la cámara', async () => {
     render(<LectorAcceso />);
     expect(document.getElementById('qr-reader')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+  });
+
+  test('error de cámara "denegado": muestra título y detalle con instrucciones', async () => {
+    Html5Qrcode.mockImplementationOnce(function () {
+      this.start = jest
+        .fn()
+        .mockRejectedValueOnce(Object.assign(new Error('x'), { name: 'NotAllowedError' }));
+      this.pause = jest.fn();
+      this.resume = jest.fn();
+      this.stop = jest.fn().mockResolvedValue();
+      this.clear = jest.fn();
+    });
+
+    render(<LectorAcceso />);
+
+    expect(await screen.findByText('No hay permiso para usar la cámara')).toBeInTheDocument();
+    expect(screen.getByText(/Ajustes → Safari → Cámara/)).toBeInTheDocument();
+  });
+
+  test('"Reintentar" vuelve a llamar a start', async () => {
+    const startMock = jest
+      .fn()
+      .mockRejectedValueOnce(Object.assign(new Error('x'), { name: 'NotAllowedError' }))
+      .mockResolvedValueOnce();
+    Html5Qrcode.mockImplementationOnce(function () {
+      this.start = startMock;
+      this.pause = jest.fn();
+      this.resume = jest.fn();
+      this.stop = jest.fn().mockResolvedValue();
+      this.clear = jest.fn();
+    });
+
+    render(<LectorAcceso />);
+    await screen.findByRole('button', { name: 'Reintentar' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+
+    await waitFor(() => expect(startMock).toHaveBeenCalledTimes(2));
+  });
+
+  test('a los 3s de validar aparece el texto de tardanza', async () => {
+    jest.useFakeTimers();
+    let resolverFetch;
+    fetchTo.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolverFetch = resolve;
+      })
+    );
+
+    render(<LectorAcceso />);
+    const scanner = ultimaInstanciaDelScanner();
+    act(() => {
+      scanner.onScanSuccess('socio-123|123456');
+    });
+
+    expect(screen.queryByText('Está tardando más de lo normal.')).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(screen.getByText('Está tardando más de lo normal.')).toBeInTheDocument();
+
+    await act(async () => {
+      resolverFetch({
+        ok: true,
+        json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+      });
+    });
+
+    jest.useRealTimers();
   });
 
   test('acceso válido: muestra el nombre del socio debajo de la cámara', async () => {
@@ -66,13 +156,90 @@ describe('LectorAcceso', () => {
     expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/validar', 'POST', {
       qr_data: 'socio-123|123456',
     });
-    expect(screen.getByText('Acceso permitido')).toBeInTheDocument();
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
     // El estado financiero es el "motivo del rechazo": no corresponde mostrarlo en un acceso válido.
     expect(screen.queryByText(/Estado financiero/)).not.toBeInTheDocument();
 
     const scanner = ultimaInstanciaDelScanner();
-    expect(scanner.pause).toHaveBeenCalledWith(true);
+    expect(scanner.pause).toHaveBeenCalledWith();
+  });
+
+  test('muestra el badge "Ingreso normal" sin evento', async () => {
+    render(<LectorAcceso />);
+    expect(screen.getByText('Ingreso normal')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+  });
+
+  test('muestra "Entrada · X" con nombreEvento', async () => {
+    render(<LectorAcceso idEvento="uuid-del-evento-999" nombreEvento="Partido de Verano" />);
+    expect(screen.getByText('Entrada · Partido de Verano')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+  });
+
+  test('vibra al decodificar y al mostrar el resultado de éxito', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    expect(navigator.vibrate).toHaveBeenCalledWith(15);
+    expect(navigator.vibrate).toHaveBeenCalledWith(40);
+    expect(sonarResultado).toHaveBeenCalledWith(true);
+  });
+
+  test('suena el zumbido de rechazo en un acceso inválido', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({
+        detail: { mensaje: 'Código QR inválido o expirado', nombre: 'Juan Pérez', estado_financiero: 'Moroso' },
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|000000');
+
+    expect(sonarResultado).toHaveBeenCalledWith(false);
+  });
+
+  test('muestra el botón de silencio si hay audio disponible y lo alterna al tocarlo', async () => {
+    render(<LectorAcceso />);
+
+    const boton = await screen.findByRole('button', { name: 'Silenciar sonido' });
+    fireEvent.click(boton);
+
+    expect(await screen.findByRole('button', { name: 'Activar sonido' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(localStorage.getItem('sonido_escaneo')).toBe('off');
+  });
+
+  test('no muestra el botón de silencio si no hay audio disponible', async () => {
+    suscribirAudioDisponible.mockImplementationOnce((callback) => {
+      callback(false);
+      return () => {};
+    });
+
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+
+    expect(screen.queryByRole('button', { name: 'Silenciar sonido' })).not.toBeInTheDocument();
   });
 
   test('acceso inválido: muestra nombre y estado financiero como motivo', async () => {
@@ -94,6 +261,7 @@ describe('LectorAcceso', () => {
     expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
     expect(screen.getByText('Estado financiero: Moroso')).toBeInTheDocument();
+    expect(navigator.vibrate).toHaveBeenCalledWith([40, 60, 40, 60, 40]);
   });
 
   test('QR con formato no reconocido: error sin nombre (ms-acceso no pudo identificar al socio)', async () => {
@@ -124,13 +292,154 @@ describe('LectorAcceso', () => {
     render(<LectorAcceso />);
     await simularEscaneo('socio-123|123456');
 
-    expect(screen.getByText('Acceso permitido')).toBeInTheDocument();
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
 
-    expect(screen.queryByText('Acceso permitido')).not.toBeInTheDocument();
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
     const scanner = ultimaInstanciaDelScanner();
     expect(scanner.resume).toHaveBeenCalled();
+  });
+
+  test('el botón "Ok" tiene el foco al aparecer el resultado', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    expect(screen.getByRole('button', { name: 'Ok' })).toHaveFocus();
+  });
+
+  test('tocar el overlay (no el botón) también cierra el resultado y reanuda', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    fireEvent.click(screen.getByRole('alert'));
+
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
+    const scanner = ultimaInstanciaDelScanner();
+    expect(scanner.resume).toHaveBeenCalled();
+  });
+
+  test('cooldown: el mismo QR no se revalida dentro de los 35s tras "Ok"', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    await simularEscaneo('socio-123|123456');
+
+    expect(fetchTo).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
+  });
+
+  test('cooldown: pasados los 35s, el mismo QR sí se revalida', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    const ahora = Date.now();
+    jest.spyOn(Date, 'now').mockReturnValue(ahora + 36000);
+
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+    await simularEscaneo('socio-123|123456');
+
+    expect(fetchTo).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
+
+    Date.now.mockRestore();
+  });
+
+  test('cooldown: un QR distinto se valida normalmente aunque el anterior esté en cooldown', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Otro Socio', estado_financiero: 'Activo' }),
+    });
+    await simularEscaneo('socio-456|999999');
+
+    expect(fetchTo).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Otro Socio')).toBeInTheDocument();
+  });
+
+  test('al volver de segundo plano con el track muerto, reinicia la cámara', async () => {
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+    const scanner = ultimaInstanciaDelScanner();
+    scanner.getRunningTrackSettings.mockReturnValueOnce(null);
+    scanner.start.mockClear();
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(scanner.stop).toHaveBeenCalled();
+    expect(scanner.start).toHaveBeenCalled();
+  });
+
+  test('al volver de segundo plano con el track vivo, no reinicia la cámara', async () => {
+    render(<LectorAcceso />);
+    await waitFor(() =>
+      expect(screen.queryByText('Iniciando cámara…')).not.toBeInTheDocument()
+    );
+    const scanner = ultimaInstanciaDelScanner();
+    scanner.start.mockClear();
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(scanner.start).not.toHaveBeenCalled();
   });
 
   test('error de red: muestra un mensaje genérico', async () => {
@@ -140,6 +449,7 @@ describe('LectorAcceso', () => {
     await simularEscaneo('socio-123|123456');
 
     expect(screen.getByText('Error procesando el código.')).toBeInTheDocument();
+    expect(navigator.vibrate).toHaveBeenCalledWith([40, 60, 40, 60, 40]);
   });
 });
 
@@ -159,7 +469,8 @@ describe('LectorAcceso - Inyección de id_evento', () => {
       start: mockStart,
       pause: mockPause,
       stop: mockStop,
-      clear: mockClear
+      clear: mockClear,
+      getRunningTrackSettings: jest.fn(() => ({ width: 640 }))
     }));
 
     // Mockeamos la respuesta exitosa del backend

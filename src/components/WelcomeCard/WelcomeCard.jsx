@@ -10,12 +10,12 @@ export function WelcomeCard({ empleado }) {
   }).format(new Date());
 
   return (
-    <section className="welcome-card">
-      <div className="welcome-card-texture" aria-hidden="true" />
+    <section className="welcome-card banner-oscuro">
+      <div className="banner-oscuro-textura" aria-hidden="true" />
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
       </div>
-      <h1 className="welcome-card-saludo">Bienvenido {empleado.nombre} {empleado.apellido}</h1>
+      <h1 className="welcome-card-saludo">Bienvenido, {empleado.nombre} {empleado.apellido}</h1>
       <p className="welcome-card-membresia">Legajo {empleado.legajo}</p>
     </section>
   );

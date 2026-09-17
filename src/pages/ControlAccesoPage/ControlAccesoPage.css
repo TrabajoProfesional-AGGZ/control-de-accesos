@@ -2,6 +2,7 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 0 var(--space-4) var(--space-6);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -10,41 +11,18 @@
 .control-acceso-banner {
   position: relative;
   overflow: hidden;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-4);
-  padding: var(--space-5) var(--space-5) var(--space-6);
-  background:
-    radial-gradient(120% 140% at 12% -10%, #4a1a2b 0%, transparent 55%),
-    radial-gradient(120% 140% at 88% 110%, #4a1a2b 0%, transparent 55%),
-    linear-gradient(155deg, #230d15 0%, #14070c 42%, #100408 100%);
+  padding: var(--space-4) var(--space-5);
   color: var(--color-surface);
   border-radius: var(--radius-xl);
-  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
-
-/* Grano sutil, mismo tratamiento que WelcomeCard para no romper el negro plano */
-.control-acceso-banner-texture {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.control-acceso-banner-titulo,
-.control-acceso-banner-subtitulo {
-  position: relative;
-  z-index: 1;
-}
-
 
 .control-acceso-banner-titulo {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -57,15 +35,9 @@
 
 .control-acceso-banner h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: -0.01em;
-}
-
-.control-acceso-banner-subtitulo {
-  margin: 0;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
 }
 
 .control-acceso-home-btn {
@@ -80,7 +52,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: var(--text-body);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
@@ -111,7 +83,7 @@
   align-items: center;
   gap: var(--space-2);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   letter-spacing: 0.01em;
   color: var(--color-text-secondary);
 }
@@ -135,16 +107,18 @@
   color: var(--color-text-secondary);
   font-family: inherit;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.modo-operacion-chip:hover:not(:disabled):not(.modo-operacion-chip--selected) {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .modo-operacion-chip:hover:not(:disabled):not(.modo-operacion-chip--selected) {
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
 }
 
 .modo-operacion-chip:focus-visible {
@@ -180,10 +154,30 @@
   color: var(--status-warning-border);
 }
 
-.modo-operacion-loading {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: 0.8rem;
-  font-style: italic;
-  color: var(--color-text-secondary);
+.modo-operacion-chip--skeleton {
+  width: 9em;
+  background: var(--color-bg-subtle);
+  border-color: transparent;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.modo-operacion-error {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-secondary);
+  color: var(--color-danger);
+}
+
+.modo-operacion-reintentar {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-danger);
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
 }

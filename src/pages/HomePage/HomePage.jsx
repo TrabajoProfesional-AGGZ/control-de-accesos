@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { QrCode } from 'lucide-react';
 import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { PerfilPage } from '../PerfilPage/PerfilPage';
 import { ControlAccesoPage } from '../ControlAccesoPage/ControlAccesoPage';
+import { desbloquearAudio } from '../../utils/sonidos';
+import { EASE } from '../../styles/motion';
 import '../../control-theme.css';
 import './HomePage.css';
 
@@ -18,29 +21,42 @@ export function HomePage({ empleado, cerrarSesion }) {
       />
 
       <main className="home-page">
-        {vista === 'perfil' && (
-          <PerfilPage empleado={empleado} cerrarSesion={cerrarSesion} />
-        )}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={vista}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: EASE.out }}
+          >
+            {vista === 'perfil' && (
+              <PerfilPage empleado={empleado} cerrarSesion={cerrarSesion} />
+            )}
 
-        {vista === 'control-acceso' && (
-          <ControlAccesoPage onVolver={() => setVista('inicio')} />
-        )}
+            {vista === 'control-acceso' && (
+              <ControlAccesoPage onVolver={() => setVista('inicio')} />
+            )}
 
-        {vista === 'inicio' && (
-          <>
-            <WelcomeCard empleado={empleado} />
+            {vista === 'inicio' && (
+              <>
+                <WelcomeCard empleado={empleado} />
 
-            <div className="main-action-container">
-              <button
-                onClick={() => setVista('control-acceso')}
-                className="btn-escanear-principal"
-              >
-                <QrCode size={48} strokeWidth={1.75} />
-                Escanear QR de socio
-              </button>
-            </div>
-          </>
-        )}
+                <div className="main-action-container">
+                  <button
+                    onClick={() => {
+                      desbloquearAudio();
+                      setVista('control-acceso');
+                    }}
+                    className="btn-escanear-principal"
+                  >
+                    <QrCode size={48} strokeWidth={1.75} />
+                    Escanear QR de socio
+                  </button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

@@ -1,12 +1,19 @@
 import { Home, ScanLine, SlidersHorizontal } from 'lucide-react';
 import { LectorAcceso } from '../../components/LectorAcceso/LectorAcceso';
 import './ControlAccesoPage.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
+import { vibrar } from '../../utils/haptics';
+import { desbloquearAudio } from '../../utils/sonidos';
 
-/** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
-function hoyISO() {
-  const hoy = new Date();
+/**
+ * Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. Recibe la fecha del
+ * servidor (header `Date` de la respuesta de `getEventosActivos`) en vez de usar `new Date()`
+ * a secas: una tablet con el reloj/huso horario mal configurado mostraría los eventos del
+ * día equivocado si se confiara en el reloj del dispositivo.
+ */
+function hoyISO(fecha) {
+  const hoy = fecha ?? new Date();
   const yyyy = hoy.getFullYear();
   const mm = String(hoy.getMonth() + 1).padStart(2, '0');
   const dd = String(hoy.getDate()).padStart(2, '0');
@@ -18,37 +25,75 @@ export function ControlAccesoPage({ onVolver }) {
   const [eventos, setEventos] = useState([]);
   const [eventoSeleccionado, setEventoSeleccionado] = useState("");
   const [cargandoEventos, setCargandoEventos] = useState(true);
-  useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        setCargandoEventos(true);
-        const data = await getEventosActivos();
-        // GET /api/v1/eventos ya excluye eventos vencidos (ver microservicio-club/CLAUDE.md,
-        // feature LOGICA DE ENTRADAS PARA EVENTOS PASADOS), pero puede seguir trayendo eventos
-        // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
-        setEventos(data.filter((evento) => evento.dia === hoyISO()));
-      } catch (error) {
-        console.error("Error al cargar eventos:", error);
-      } finally {
-        setCargandoEventos(false);
-      }
-    };
+  const [errorEventos, setErrorEventos] = useState(false);
 
-    fetchEventos();
+  // silencioso=true: refetch en segundo plano (visibilitychange / intervalo). No toca el
+  // skeleton ni el aviso de error de W2 — un aviso cada 5 min por una red intermitente
+  // sería ruido en un puesto de entrada; se mantiene la lista anterior si falla.
+  const fetchEventos = useCallback(async (silencioso = false) => {
+    try {
+      if (!silencioso) {
+        setCargandoEventos(true);
+        setErrorEventos(false);
+      }
+      const { eventos: data, fechaServidor } = await getEventosActivos();
+      // GET /api/v1/eventos ya excluye eventos vencidos, pero puede seguir trayendo eventos
+      // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
+      const deHoy = data.filter((evento) => evento.dia === hoyISO(fechaServidor));
+      setEventos(deHoy);
+      setEventoSeleccionado((actual) => {
+        if (actual && !deHoy.some((evento) => evento.id === actual)) {
+          // el evento elegido terminó/se borró/cambió de día: el modo cambió sin que el
+          // empleado lo pidiera, tiene que notarlo (el badge de LectorAcceso lo muestra).
+          vibrar(15);
+          return '';
+        }
+        return actual;
+      });
+    } catch (error) {
+      console.error("Error al cargar eventos:", error);
+      if (!silencioso) setErrorEventos(true);
+    } finally {
+      if (!silencioso) setCargandoEventos(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchEventos();
+  }, [fetchEventos]);
+
+  // Respaldo por si algún día se aterriza directo en la cámara (R4) o la sesión se restaura
+  // acá: el toque de "Escanear QR de socio" en HomePage ya desbloquea el audio, pero tocar
+  // un chip de modo también cuenta como gesto de usuario.
+  useEffect(() => {
+    document.addEventListener('pointerdown', desbloquearAudio, { once: true });
+    return () => document.removeEventListener('pointerdown', desbloquearAudio);
+  }, []);
+
+  // Refresco en segundo plano: una tablet fija en el puesto queda horas en esta vista.
+  useEffect(() => {
+    function alVolverVisible() {
+      if (document.visibilityState === 'visible') fetchEventos(true);
+    }
+    document.addEventListener('visibilitychange', alVolverVisible);
+    const intervalo = setInterval(() => fetchEventos(true), 5 * 60 * 1000);
+    return () => {
+      document.removeEventListener('visibilitychange', alVolverVisible);
+      clearInterval(intervalo);
+    };
+  }, [fetchEventos]);
+
+  const nombreEvento = eventos.find((e) => e.id === eventoSeleccionado)?.nombre ?? '';
 
   return (
     <div className="control-acceso-page">
-      <div className="control-acceso-banner">
-        <div className="control-acceso-banner-texture" aria-hidden="true" />
+      <div className="control-acceso-banner banner-oscuro">
+        <div className="banner-oscuro-textura" aria-hidden="true" />
 
         <div className="control-acceso-banner-titulo">
           <ScanLine size={22} className="control-acceso-banner-icono" aria-hidden="true" />
           <h1>Control de Acceso</h1>
         </div>
-        <p className="control-acceso-banner-subtitulo">
-          Escaneá el QR del socio para validar su ingreso
-        </p>
       </div>
 
       <div className={`modo-operacion${eventoSeleccionado ? ' modo-operacion--evento' : ''}`}>
@@ -61,8 +106,10 @@ export function ControlAccesoPage({ onVolver }) {
             type="button"
             role="radio"
             aria-checked={eventoSeleccionado === ''}
-            disabled={cargandoEventos}
-            onClick={() => setEventoSeleccionado('')}
+            onClick={() => {
+              vibrar(15);
+              setEventoSeleccionado('');
+            }}
             className={`modo-operacion-chip${eventoSeleccionado === '' ? ' modo-operacion-chip--selected' : ''}`}
           >
             Ingreso normal al club
@@ -73,23 +120,34 @@ export function ControlAccesoPage({ onVolver }) {
               type="button"
               role="radio"
               aria-checked={eventoSeleccionado === evento.id}
-              disabled={cargandoEventos}
-              onClick={() => setEventoSeleccionado(evento.id)}
+              onClick={() => {
+                vibrar(15);
+                setEventoSeleccionado(evento.id);
+              }}
               className={`modo-operacion-chip${eventoSeleccionado === evento.id ? ' modo-operacion-chip--selected' : ''}`}
             >
               Validar entrada: {evento.nombre}
             </button>
           ))}
+          {cargandoEventos && (
+            <span className="modo-operacion-chip modo-operacion-chip--skeleton" aria-hidden="true" />
+          )}
         </div>
-        {cargandoEventos && <span className="modo-operacion-loading">Cargando eventos...</span>}
+        {errorEventos && !cargandoEventos && (
+          <p className="modo-operacion-error" role="alert">
+            No se pudieron cargar los eventos de hoy.{' '}
+            <button type="button" className="modo-operacion-reintentar" onClick={() => fetchEventos()}>
+              Reintentar
+            </button>
+          </p>
+        )}
       </div>
 
-      <LectorAcceso idEvento={eventoSeleccionado} />
+      <LectorAcceso idEvento={eventoSeleccionado} nombreEvento={nombreEvento} />
 
       <button
         onClick={onVolver}
         className="control-acceso-home-btn"
-        aria-label="Ir a la página principal"
       >
         <Home size={20} />
         Ir al inicio
