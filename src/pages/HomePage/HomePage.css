@@ -35,7 +35,7 @@
   width: 100%;
   max-width: 260px;
   aspect-ratio: 1 / 1;
-  font-size: 1.1rem;
+  font-size: var(--text-heading);
   font-weight: 700;
   text-align: center;
   background-color: var(--color-text-primary);

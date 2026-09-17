@@ -35,7 +35,7 @@
 
 .control-acceso-banner h1 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -52,7 +52,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: var(--text-body);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
@@ -83,7 +83,7 @@
   align-items: center;
   gap: var(--space-2);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   letter-spacing: 0.01em;
   color: var(--color-text-secondary);
 }
@@ -107,7 +107,7 @@
   color: var(--color-text-secondary);
   font-family: inherit;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
   cursor: pointer;
@@ -168,7 +168,7 @@
 
 .modo-operacion-error {
   margin: var(--space-2) 0 0;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-danger);
 }
 

@@ -92,6 +92,16 @@
   /* Typography */
   --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Escala tipográfica: tamaño / leading / tracking apareados. Espejo de aplicacion. */
+  --text-display: 2rem;     --leading-display: 1.05; --tracking-display: -0.03em;
+  --text-title: 1.65rem;    --leading-title: 1.15;   --tracking-title: -0.02em;
+  --text-heading: 1.15rem;  --leading-heading: 1.25; --tracking-heading: -0.01em;
+  --text-body: 1rem;        --leading-body: 1.5;     --tracking-body: 0;
+  --text-secondary: 0.875rem; --leading-secondary: 1.45; --tracking-secondary: 0;
+  --text-caption: 0.78rem;  --leading-caption: 1.4;  --tracking-caption: 0.01em;
+  --text-label: 0.7rem;     --leading-label: 1.2;    --tracking-label: 0.06em;
+  --text-micro: 0.65rem;    --leading-micro: 1.2;    --tracking-micro: 0.04em;
 }
 
 /* Preferencias de accesibilidad del sistema operativo. */

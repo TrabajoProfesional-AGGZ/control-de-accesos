@@ -24,14 +24,14 @@
 .welcome-card-fecha {
   margin: 0;
   text-transform: capitalize;
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.55);
 }
 
 .welcome-card-saludo {
   margin: 0 0 var(--space-5);
-  font-size: 1.85rem;
+  font-size: var(--text-display);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
@@ -44,13 +44,13 @@
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 1rem;
+  font-size: var(--text-body);
   letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.85);
 }
 
 @media (max-width: 480px) {
   .welcome-card-saludo {
-    font-size: 1.4rem;
+    font-size: var(--text-title);
   }
 }

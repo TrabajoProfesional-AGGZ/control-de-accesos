@@ -29,7 +29,7 @@
   justify-content: center;
   background-color: var(--color-text-primary);
   color: var(--color-surface);
-  font-size: 1.1rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -43,7 +43,7 @@
 
 .perfil-card-nombre {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -87,12 +87,12 @@
 }
 
 .perfil-dato-label {
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
 .perfil-dato-valor {
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -109,7 +109,7 @@
   padding: var(--space-4);
   font: inherit;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   cursor: pointer;
   transition: background-color var(--transition-normal);
 }
@@ -168,7 +168,7 @@
   color: var(--color-danger);
   font: inherit;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   cursor: pointer;
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
