@@ -72,7 +72,7 @@ describe('LectorAcceso', () => {
     expect(screen.queryByText(/Estado financiero/)).not.toBeInTheDocument();
 
     const scanner = ultimaInstanciaDelScanner();
-    expect(scanner.pause).toHaveBeenCalledWith(true);
+    expect(scanner.pause).toHaveBeenCalledWith();
   });
 
   test('acceso inválido: muestra nombre y estado financiero como motivo', async () => {

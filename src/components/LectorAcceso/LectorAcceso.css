@@ -130,3 +130,10 @@
 .lector-resultado-ok:active {
   transform: scale(0.96);
 }
+
+/* html5-qrcode inyecta un "Scanner paused" en cada pause(). 
+   !important le gana al inline.
+   El único otro <div> hijo directo es #qr-shaded-region (la guía). */
+#qr-reader > div:not(#qr-shaded-region) {
+  display: none !important;
+}

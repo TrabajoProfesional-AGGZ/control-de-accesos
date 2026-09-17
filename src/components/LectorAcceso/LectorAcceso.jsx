@@ -72,7 +72,7 @@ export const LectorAcceso = ({ idEvento }) => {
       if (validandoRef.current) return;
       validandoRef.current = true;
       try {
-        qrCode.pause(true);
+        qrCode.pause();
       } catch {
         // el escáner puede no estar corriendo todavía si el usuario escanea muy rápido
       }
