@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PerfilPage } from './PerfilPage';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
@@ -34,7 +34,7 @@ describe('PerfilPage', () => {
     expect(cerrarSesion).toHaveBeenCalledTimes(1);
   });
 
-  test('abre y cierra el modal de cambiar contraseña', () => {
+  test('abre y cierra el modal de cambiar contraseña', async () => {
     render(<PerfilPage empleado={empleado} cerrarSesion={jest.fn()} />);
     expect(screen.queryByRole('heading', { name: 'Cambiar contraseña' })).not.toBeInTheDocument();
 
@@ -42,6 +42,8 @@ describe('PerfilPage', () => {
     expect(screen.getByRole('heading', { name: 'Cambiar contraseña' })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
-    expect(screen.queryByRole('heading', { name: 'Cambiar contraseña' })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: 'Cambiar contraseña' })).not.toBeInTheDocument()
+    );
   });
 });

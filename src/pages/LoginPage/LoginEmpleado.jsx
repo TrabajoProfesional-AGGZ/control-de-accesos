@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { login } from '../../utils/authService';
 import { useAuth } from '../../hooks/useAuth';
@@ -244,9 +244,11 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
 
       </motion.div>
 
-      {mostrarRecuperar && (
-        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
-      )}
+      <AnimatePresence>
+        {mostrarRecuperar && (
+          <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
