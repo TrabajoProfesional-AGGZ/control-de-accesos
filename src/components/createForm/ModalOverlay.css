@@ -1,9 +1,9 @@
 .csf-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.38);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background-color: var(--color-scrim);
+  backdrop-filter: var(--scrim-blur);
+  -webkit-backdrop-filter: var(--scrim-blur);
   display: flex;
   align-items: center;
   justify-content: center;

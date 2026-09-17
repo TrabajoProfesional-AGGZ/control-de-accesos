@@ -45,7 +45,7 @@ button, [role="button"] { min-height: 48px; }
     scroll-behavior: auto;
   }
 
-  *,
+  *:not(.lector-resultado),
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
@@ -53,4 +53,15 @@ button, [role="button"] { min-height: 48px; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* El resultado del escaneo sigue animando (fade, sin el scale de F4): sin esto
+     el veredicto aparece/desaparece sin transición perceptible entre escaneos. */
+  .lector-resultado {
+    animation: lector-resultado-fade 0.15s linear;
+  }
+}
+
+@keyframes lector-resultado-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

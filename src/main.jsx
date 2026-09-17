@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { MotionConfig } from 'framer-motion'
 import App from './App.jsx'
 import '@fontsource-variable/archivo'
 import './index.css'
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 <React.StrictMode>
     <ErrorBoundary>
       <AuthProvider>
-        <App />
+        <MotionConfig reducedMotion="user">
+          <App />
+        </MotionConfig>
       </AuthProvider>
     </ErrorBoundary>
   </React.StrictMode>,
