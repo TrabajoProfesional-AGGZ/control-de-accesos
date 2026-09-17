@@ -39,7 +39,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* TODO M1: --ease-out */
+  transition: background-color 0.15s var(--ease-out);
 }
 
 .lector-modo--evento {
@@ -130,7 +130,7 @@
   justify-content: flex-start;
   padding: var(--space-5) var(--space-5) 0;
   cursor: pointer;
-  animation: lector-resultado-entrada 0.25s cubic-bezier(0.16, 1, 0.3, 1); /* TODO M1 */
+  animation: lector-resultado-entrada 0.25s var(--ease-out);
 }
 
 @keyframes lector-resultado-entrada {
@@ -147,7 +147,7 @@
 /* Las 8 esquinas de la guía que dibuja html5-qrcode son <div> hijos de
    #qr-shaded-region con background blanco inline. */
 #qr-shaded-region > div {
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* TODO M1: --ease-out */
+  transition: background-color 0.15s var(--ease-out);
 }
 
 .lector-camara--leido #qr-shaded-region > div {
