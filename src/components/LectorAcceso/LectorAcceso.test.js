@@ -56,6 +56,44 @@ describe('LectorAcceso', () => {
     );
   });
 
+  test('error de cámara "denegado": muestra título y detalle con instrucciones', async () => {
+    Html5Qrcode.mockImplementationOnce(function () {
+      this.start = jest
+        .fn()
+        .mockRejectedValueOnce(Object.assign(new Error('x'), { name: 'NotAllowedError' }));
+      this.pause = jest.fn();
+      this.resume = jest.fn();
+      this.stop = jest.fn().mockResolvedValue();
+      this.clear = jest.fn();
+    });
+
+    render(<LectorAcceso />);
+
+    expect(await screen.findByText('No hay permiso para usar la cámara')).toBeInTheDocument();
+    expect(screen.getByText(/Ajustes → Safari → Cámara/)).toBeInTheDocument();
+  });
+
+  test('"Reintentar" vuelve a llamar a start', async () => {
+    const startMock = jest
+      .fn()
+      .mockRejectedValueOnce(Object.assign(new Error('x'), { name: 'NotAllowedError' }))
+      .mockResolvedValueOnce();
+    Html5Qrcode.mockImplementationOnce(function () {
+      this.start = startMock;
+      this.pause = jest.fn();
+      this.resume = jest.fn();
+      this.stop = jest.fn().mockResolvedValue();
+      this.clear = jest.fn();
+    });
+
+    render(<LectorAcceso />);
+    await screen.findByRole('button', { name: 'Reintentar' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+
+    await waitFor(() => expect(startMock).toHaveBeenCalledTimes(2));
+  });
+
   test('acceso válido: muestra el nombre del socio debajo de la cámara', async () => {
     fetchTo.mockResolvedValueOnce({
       ok: true,

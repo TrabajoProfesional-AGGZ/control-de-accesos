@@ -7,6 +7,35 @@ import './LectorAcceso.css';
 
 const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero: null };
 
+const ERRORES_CAMARA = {
+  denegado: {
+    titulo: 'No hay permiso para usar la cámara',
+    detalle:
+      'Android: mantené apretado el ícono de la app → Información → Permisos → Cámara → Permitir. iPhone: Ajustes → Safari → Cámara. Después tocá Reintentar.',
+  },
+  'sin-camara': {
+    titulo: 'No se encontró una cámara',
+    detalle: 'Probá en otro dispositivo.',
+  },
+  ocupada: {
+    titulo: 'La cámara está en uso por otra app',
+    detalle: 'Cerrá la otra app y tocá Reintentar.',
+  },
+  otro: {
+    titulo: 'No se pudo iniciar la cámara',
+    detalle: 'Tocá Reintentar. Si sigue, cerrá y volvé a abrir la app.',
+  },
+};
+
+/** html5-qrcode a veces rechaza con un string en vez de un DOMException. */
+function clasificarErrorCamara(err) {
+  const name = err?.name ?? (typeof err === 'string' ? err : '');
+  if (name === 'NotAllowedError' || /permission/i.test(name)) return 'denegado';
+  if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'sin-camara';
+  if (name === 'NotReadableError' || name === 'AbortError') return 'ocupada';
+  return 'otro';
+}
+
 /**
  * Lector de QR de acceso: arranca la cámara al montar, valida cada escaneo
  * contra `ms-acceso` y muestra el resultado superpuesto sobre la cámara.
@@ -16,7 +45,7 @@ const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero
 export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const [resultado, setResultado] = useState(ESTADO_INICIAL);
   const [validando, setValidando] = useState(false);
-  const [errorCamara, setErrorCamara] = useState(false);
+  const [errorCamara, setErrorCamara] = useState(null);
   const [leido, setLeido] = useState(false);
   const [camaraLista, setCamaraLista] = useState(false);
 
@@ -24,6 +53,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const validandoRef = useRef(false);
   const idEventoRef = useRef(idEvento);
   const leidoTimeoutRef = useRef(null);
+  const iniciarRef = useRef(null);
 
   useEffect(() => {
     idEventoRef.current = idEvento;
@@ -56,33 +86,38 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
       }
     }
 
-    qrCode
-      .start(
-        { facingMode: 'environment' },
-        {
-          fps: 10,
-          qrbox: (w, h) => {
-            const s = Math.round(Math.min(w, h) * 0.72);
-            return { width: s, height: s };
+    function iniciarCamara() {
+      qrCode
+        .start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: (w, h) => {
+              const s = Math.round(Math.min(w, h) * 0.72);
+              return { width: s, height: s };
+            },
+            aspectRatio: 4 / 3,
           },
-          aspectRatio: 4 / 3,
-        },
-        onScanSuccess,
-        onScanFailure
-      )
-      .then(() => {
-        // en StrictMode (dev) el efecto se monta, limpia y vuelve a montar antes de que
-        // .start() resuelva — si ya nos limpiaron para cuando llega acá, hay que frenar
-        // la cámara igual (si no, queda un stream de video huérfano).
-        if (cancelado) {
-          detener();
-        } else {
-          setCamaraLista(true);
-        }
-      })
-      .catch(() => {
-        if (!cancelado) setErrorCamara(true);
-      });
+          onScanSuccess,
+          onScanFailure
+        )
+        .then(() => {
+          // en StrictMode (dev) el efecto se monta, limpia y vuelve a montar antes de que
+          // .start() resuelva — si ya nos limpiaron para cuando llega acá, hay que frenar
+          // la cámara igual (si no, queda un stream de video huérfano).
+          if (cancelado) {
+            detener();
+          } else {
+            setCamaraLista(true);
+          }
+        })
+        .catch((err) => {
+          if (!cancelado) setErrorCamara(clasificarErrorCamara(err));
+        });
+    }
+    iniciarRef.current = iniciarCamara;
+
+    iniciarCamara();
 
     async function onScanSuccess(decodedText) {
       if (validandoRef.current) return;
@@ -186,8 +221,18 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         {errorCamara && (
           <div className="lector-overlay lector-overlay--error" role="alert">
             <CameraOff size={48} className="lector-overlay-icono" />
-            <h3 className="lector-overlay-mensaje">No se pudo acceder a la cámara</h3>
-            <p className="lector-overlay-nombre">Revisá los permisos de cámara del navegador.</p>
+            <h3 className="lector-overlay-mensaje">{ERRORES_CAMARA[errorCamara].titulo}</h3>
+            <p className="lector-overlay-nombre">{ERRORES_CAMARA[errorCamara].detalle}</p>
+            <button
+              type="button"
+              className="lector-reintentar"
+              onClick={() => {
+                setErrorCamara(null);
+                iniciarRef.current();
+              }}
+            >
+              Reintentar
+            </button>
           </div>
         )}
 
