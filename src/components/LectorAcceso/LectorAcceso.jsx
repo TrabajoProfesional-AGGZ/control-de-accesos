@@ -26,10 +26,12 @@ export const LectorAcceso = ({ idEvento }) => {
   const [resultado, setResultado] = useState(ESTADO_INICIAL);
   const [validando, setValidando] = useState(false);
   const [errorCamara, setErrorCamara] = useState(false);
+  const [leido, setLeido] = useState(false);
 
   const scannerRef = useRef(null);
   const validandoRef = useRef(false);
   const idEventoRef = useRef(idEvento);
+  const leidoTimeoutRef = useRef(null);
 
   useEffect(() => {
     idEventoRef.current = idEvento;
@@ -83,6 +85,8 @@ export const LectorAcceso = ({ idEvento }) => {
       if (validandoRef.current) return;
       validandoRef.current = true;
       vibrar(15);
+      setLeido(true);
+      leidoTimeoutRef.current = setTimeout(() => setLeido(false), 150);
       try {
         qrCode.pause();
       } catch {
@@ -140,6 +144,7 @@ export const LectorAcceso = ({ idEvento }) => {
     return () => {
       cancelado = true;
       detener();
+      clearTimeout(leidoTimeoutRef.current);
       window.removeEventListener('unhandledrejection', ignorarAbortDePlayInterrumpido);
     };
   }, []);
@@ -160,7 +165,7 @@ export const LectorAcceso = ({ idEvento }) => {
   return (
     <div className="lector-container">
       <div className="lector-camara-wrapper">
-        <div id="qr-reader" className="lector-camara" />
+        <div id="qr-reader" className={`lector-camara${leido ? ' lector-camara--leido' : ''}`} />
 
         {errorCamara && (
           <div className="lector-overlay lector-overlay--error" role="alert">

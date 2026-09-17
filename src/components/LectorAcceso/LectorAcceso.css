@@ -69,12 +69,22 @@
 @keyframes lector-resultado-entrada {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
+}
+
+/* Las 8 esquinas de la guía que dibuja html5-qrcode son <div> hijos de
+   #qr-shaded-region con background blanco inline. */
+#qr-shaded-region > div {
+  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* TODO M1: --ease-out */
+}
+
+.lector-camara--leido #qr-shaded-region > div {
+  background-color: var(--status-success-bg) !important;
 }
 
 /* Jerarquía a un brazo de distancia: eyebrow (modo) < veredicto < nombre (lo más
