@@ -6,6 +6,17 @@ import './LectorAcceso.css';
 
 const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero: null };
 
+/** Háptico: se ignora en iOS (sin API) y en Chrome sin activación previa. */
+function vibrar(patron) {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try {
+      navigator.vibrate(patron);
+    } catch {
+      // no-op
+    }
+  }
+}
+
 /**
  * Lector de QR de acceso: arranca la cámara al montar, valida cada escaneo
  * contra `ms-acceso` y muestra el resultado superpuesto sobre la cámara.
@@ -71,6 +82,7 @@ export const LectorAcceso = ({ idEvento }) => {
     async function onScanSuccess(decodedText) {
       if (validandoRef.current) return;
       validandoRef.current = true;
+      vibrar(15);
       try {
         qrCode.pause();
       } catch {
@@ -88,6 +100,7 @@ export const LectorAcceso = ({ idEvento }) => {
         const data = await res.json();
 
         if (res.ok) {
+          vibrar(40);
           setResultado({
             tipo: 'exito',
             mensaje: 'Acceso permitido',
@@ -97,6 +110,7 @@ export const LectorAcceso = ({ idEvento }) => {
         } else {
           const detalle = data.detail;
           const esDetalleEstructurado = detalle && typeof detalle === 'object';
+          vibrar([40, 60, 40, 60, 40]);
           setResultado({
             tipo: 'error',
             mensaje: esDetalleEstructurado
@@ -107,6 +121,7 @@ export const LectorAcceso = ({ idEvento }) => {
           });
         }
       } catch {
+        vibrar([40, 60, 40, 60, 40]);
         setResultado({
           tipo: 'error',
           mensaje: 'Error procesando el código.',

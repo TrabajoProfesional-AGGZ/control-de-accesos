@@ -41,6 +41,11 @@ async function simularEscaneo(qrData) {
 describe('LectorAcceso', () => {
   beforeEach(() => {
     fetchTo.mockClear();
+    Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
+  });
+
+  afterEach(() => {
+    delete navigator.vibrate;
   });
 
   test('renderiza el contenedor de la cámara', () => {
@@ -75,6 +80,25 @@ describe('LectorAcceso', () => {
     expect(scanner.pause).toHaveBeenCalledWith();
   });
 
+  test('vibra al decodificar y al mostrar el resultado de éxito', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    expect(navigator.vibrate).toHaveBeenCalledWith(15);
+    expect(navigator.vibrate).toHaveBeenCalledWith(40);
+  });
+
   test('acceso inválido: muestra nombre y estado financiero como motivo', async () => {
     fetchTo.mockResolvedValueOnce({
       ok: false,
@@ -94,6 +118,7 @@ describe('LectorAcceso', () => {
     expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
     expect(screen.getByText('Estado financiero: Moroso')).toBeInTheDocument();
+    expect(navigator.vibrate).toHaveBeenCalledWith([40, 60, 40, 60, 40]);
   });
 
   test('QR con formato no reconocido: error sin nombre (ms-acceso no pudo identificar al socio)', async () => {
@@ -180,6 +205,7 @@ describe('LectorAcceso', () => {
     await simularEscaneo('socio-123|123456');
 
     expect(screen.getByText('Error procesando el código.')).toBeInTheDocument();
+    expect(navigator.vibrate).toHaveBeenCalledWith([40, 60, 40, 60, 40]);
   });
 });
 
