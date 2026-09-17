@@ -21,24 +21,52 @@ export function ControlAccesoPage({ onVolver }) {
   const [cargandoEventos, setCargandoEventos] = useState(true);
   const [errorEventos, setErrorEventos] = useState(false);
 
-  const fetchEventos = useCallback(async () => {
+  // silencioso=true: refetch en segundo plano (visibilitychange / intervalo). No toca el
+  // skeleton ni el aviso de error de W2 — un aviso cada 5 min por una red intermitente
+  // sería ruido en un puesto de entrada; se mantiene la lista anterior si falla.
+  const fetchEventos = useCallback(async (silencioso = false) => {
     try {
-      setCargandoEventos(true);
-      setErrorEventos(false);
+      if (!silencioso) {
+        setCargandoEventos(true);
+        setErrorEventos(false);
+      }
       const data = await getEventosActivos();
       // GET /api/v1/eventos ya excluye eventos vencidos, pero puede seguir trayendo eventos
       // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
-      setEventos(data.filter((evento) => evento.dia === hoyISO()));
+      const deHoy = data.filter((evento) => evento.dia === hoyISO());
+      setEventos(deHoy);
+      setEventoSeleccionado((actual) => {
+        if (actual && !deHoy.some((evento) => evento.id === actual)) {
+          // el evento elegido terminó/se borró/cambió de día: el modo cambió sin que el
+          // empleado lo pidiera, tiene que notarlo (el badge de LectorAcceso lo muestra).
+          vibrar(15);
+          return '';
+        }
+        return actual;
+      });
     } catch (error) {
       console.error("Error al cargar eventos:", error);
-      setErrorEventos(true);
+      if (!silencioso) setErrorEventos(true);
     } finally {
-      setCargandoEventos(false);
+      if (!silencioso) setCargandoEventos(false);
     }
   }, []);
 
   useEffect(() => {
     fetchEventos();
+  }, [fetchEventos]);
+
+  // Refresco en segundo plano: una tablet fija en el puesto queda horas en esta vista.
+  useEffect(() => {
+    function alVolverVisible() {
+      if (document.visibilityState === 'visible') fetchEventos(true);
+    }
+    document.addEventListener('visibilitychange', alVolverVisible);
+    const intervalo = setInterval(() => fetchEventos(true), 5 * 60 * 1000);
+    return () => {
+      document.removeEventListener('visibilitychange', alVolverVisible);
+      clearInterval(intervalo);
+    };
   }, [fetchEventos]);
 
   const nombreEvento = eventos.find((e) => e.id === eventoSeleccionado)?.nombre ?? '';
@@ -94,7 +122,7 @@ export function ControlAccesoPage({ onVolver }) {
         {errorEventos && !cargandoEventos && (
           <p className="modo-operacion-error" role="alert">
             No se pudieron cargar los eventos de hoy.{' '}
-            <button type="button" className="modo-operacion-reintentar" onClick={fetchEventos}>
+            <button type="button" className="modo-operacion-reintentar" onClick={() => fetchEventos()}>
               Reintentar
             </button>
           </p>

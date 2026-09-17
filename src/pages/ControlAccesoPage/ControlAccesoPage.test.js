@@ -105,3 +105,88 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
     expect(screen.queryByText('Validar entrada: Torneo del mes que viene')).not.toBeInTheDocument();
   });
 });
+
+describe('ControlAccesoPage - Refresco de eventos en segundo plano (W5)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('refetchea cada 5 minutos mientras la vista está montada', async () => {
+    jest.useFakeTimers();
+    getEventosActivos.mockResolvedValue([]);
+
+    render(<ControlAccesoPage onVolver={jest.fn()} />);
+    await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(1));
+
+    await jest.advanceTimersByTimeAsync(5 * 60 * 1000);
+    expect(getEventosActivos).toHaveBeenCalledTimes(2);
+  });
+
+  test('refetchea al volver a visible', async () => {
+    getEventosActivos.mockResolvedValue([]);
+
+    render(<ControlAccesoPage onVolver={jest.fn()} />);
+    await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(1));
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(2));
+  });
+
+  test('un refetch silencioso fallido no muestra el aviso de error ni vacía la lista', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    getEventosActivos
+      .mockResolvedValueOnce([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }])
+      .mockRejectedValueOnce(new Error('network error'));
+
+    render(<ControlAccesoPage onVolver={jest.fn()} />);
+    await screen.findByText('Validar entrada: Partido de Verano');
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    await waitFor(() => expect(getEventosActivos).toHaveBeenCalledTimes(2));
+    expect(screen.getByText('Validar entrada: Partido de Verano')).toBeInTheDocument();
+    expect(screen.queryByText('No se pudieron cargar los eventos de hoy.')).not.toBeInTheDocument();
+  });
+
+  test('si el evento elegido desaparece del refetch, vuelve a "Ingreso normal al club"', async () => {
+    getEventosActivos
+      .mockResolvedValueOnce([{ id: 'evento-hoy', nombre: 'Partido de Verano', dia: hoyISO() }])
+      .mockResolvedValueOnce([]);
+    Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
+
+    render(<ControlAccesoPage onVolver={jest.fn()} />);
+    const chipEvento = await screen.findByRole('radio', { name: 'Validar entrada: Partido de Verano' });
+    await userEvent.click(chipEvento);
+    expect(screen.getByTestId('lector-mock')).toHaveTextContent('Evento ID: evento-hoy');
+
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    await waitFor(() =>
+      expect(screen.getByRole('radio', { name: 'Ingreso normal al club' })).toHaveAttribute(
+        'aria-checked',
+        'true'
+      )
+    );
+    expect(screen.getByTestId('lector-mock')).toHaveTextContent('Evento ID:');
+    expect(screen.getByTestId('lector-mock')).not.toHaveTextContent('Evento ID: evento-hoy');
+
+    delete navigator.vibrate;
+  });
+});
