@@ -77,15 +77,25 @@
   }
 }
 
+/* Jerarquía a un brazo de distancia: eyebrow (modo) < veredicto < nombre (lo más
+   grande de la pantalla) < mensaje/estado financiero. Tokens --text-heading y
+   --ease-out pendientes de D1/M1; hasta entonces, valores literales. */
 .lector-resultado-eyebrow {
   margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   font-weight: 600;
-} /* TODO L1 */
+  opacity: 0.85;
+}
 
 .lector-resultado-veredicto {
-  margin: 0;
+  margin: var(--space-2) 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   font-weight: 700;
-} /* TODO L1 */
+}
 
 .lector-resultado--exito {
   background-color: var(--status-success-border);
@@ -99,21 +109,24 @@
   flex-shrink: 0;
 }
 
-.lector-resultado-mensaje {
-  margin: 0;
-  font-size: 1.15rem;
+.lector-resultado-nombre {
+  margin: var(--space-1) 0 0;
+  font-size: 2.25rem; /* TODO D1: --text-heading */
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   font-weight: 700;
+  text-wrap: balance;
 }
 
-.lector-resultado-nombre {
-  margin: 0;
+.lector-resultado-mensaje {
+  margin: var(--space-3) 0 0;
   font-size: 1rem;
-  font-weight: 600;
+  line-height: 1.4;
 }
 
 .lector-resultado-estado-financiero {
-  margin: 0;
-  font-size: 0.9rem;
+  margin: var(--space-1) 0 0;
+  font-size: 0.875rem;
   opacity: 0.9;
 }
 
