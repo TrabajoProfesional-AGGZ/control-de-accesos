@@ -56,6 +56,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const leidoTimeoutRef = useRef(null);
   const validandoLentoTimeoutRef = useRef(null);
   const iniciarRef = useRef(null);
+  const ultimoQrRef = useRef({ texto: null, hasta: 0 });
 
   useEffect(() => {
     idEventoRef.current = idEvento;
@@ -122,6 +123,9 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     iniciarCamara();
 
     async function onScanSuccess(decodedText) {
+      if (decodedText === ultimoQrRef.current.texto && Date.now() < ultimoQrRef.current.hasta) {
+        return;
+      }
       if (validandoRef.current) return;
       validandoRef.current = true;
       vibrar(15);
@@ -174,6 +178,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
           estadoFinanciero: null,
         });
       } finally {
+        ultimoQrRef.current = { texto: decodedText, hasta: Date.now() + 35000 };
         clearTimeout(validandoLentoTimeoutRef.current);
         setValidando(false);
         setValidandoLento(false);

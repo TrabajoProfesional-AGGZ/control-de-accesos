@@ -288,6 +288,67 @@ describe('LectorAcceso', () => {
     expect(scanner.resume).toHaveBeenCalled();
   });
 
+  test('cooldown: el mismo QR no se revalida dentro de los 35s tras "Ok"', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    await simularEscaneo('socio-123|123456');
+
+    expect(fetchTo).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
+  });
+
+  test('cooldown: pasados los 35s, el mismo QR sí se revalida', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    const ahora = Date.now();
+    jest.spyOn(Date, 'now').mockReturnValue(ahora + 36000);
+
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+    await simularEscaneo('socio-123|123456');
+
+    expect(fetchTo).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
+
+    Date.now.mockRestore();
+  });
+
+  test('cooldown: un QR distinto se valida normalmente aunque el anterior esté en cooldown', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+    fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
+
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ nombre: 'Otro Socio', estado_financiero: 'Activo' }),
+    });
+    await simularEscaneo('socio-456|999999');
+
+    expect(fetchTo).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Otro Socio')).toBeInTheDocument();
+  });
+
   test('error de red: muestra un mensaje genérico', async () => {
     fetchTo.mockRejectedValueOnce(new Error('network error'));
 
