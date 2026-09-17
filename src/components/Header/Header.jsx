@@ -6,7 +6,7 @@ import './Header.css';
 export function Header({ onPerfil }) {
   return (
     <header className="app-header">
-      <button onClick={onPerfil} className="app-header-perfil" aria-label="Mi perfil">
+      <button onClick={onPerfil} className="app-header-perfil hit-area" aria-label="Mi perfil">
         <CircleUserRound size={24} color="#111111" />
       </button>
       <img src={logoTexto} alt="SocioUnido" className="app-header-logo" />

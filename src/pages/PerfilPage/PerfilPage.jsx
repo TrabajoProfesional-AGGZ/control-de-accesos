@@ -28,7 +28,7 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
       />
       <button
         type="button"
-        className="perfil-toggle-password"
+        className="perfil-toggle-password hit-area"
         onClick={() => setMostrar((v) => !v)}
         aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
       >

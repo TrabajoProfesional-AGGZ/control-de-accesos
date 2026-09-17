@@ -203,7 +203,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
               />
               <button
                 type="button"
-                className="login-toggle-password"
+                className="login-toggle-password hit-area"
                 onClick={() => setMostrarPassword((v) => !v)}
                 aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >

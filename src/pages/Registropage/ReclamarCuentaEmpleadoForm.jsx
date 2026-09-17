@@ -31,7 +31,7 @@ function PasswordField({ id, label, value, onChange, autoComplete, error }) {
         />
         <button
           type="button"
-          className="login-toggle-password"
+          className="login-toggle-password hit-area"
           onClick={() => setMostrar((v) => !v)}
           aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >

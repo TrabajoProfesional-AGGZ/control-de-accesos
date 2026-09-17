@@ -34,6 +34,12 @@ button:active:not(:disabled) {
   outline-offset: 2px;
 }
 
+/* Área de toque mínima: 48px cubre Material (48dp) y HIG (44pt). Los
+   íconos chicos amplían la zona sensible sin cambiar el dibujo. */
+button, [role="button"] { min-height: 48px; }
+.hit-area { position: relative; }
+.hit-area::before { content: ''; position: absolute; inset: -12px; }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
