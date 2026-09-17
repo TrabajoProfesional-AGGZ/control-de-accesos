@@ -12,13 +12,13 @@ import '../../control-theme.css';
 // Variantes de framer-motion para la entrada/salida escalonada del formulario.
 const formContainerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.8 } },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.3 } },
   exiting: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 };
 
 const formItemVariants = {
   hidden: { y: 30, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
@@ -43,7 +43,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
 
   useEffect(() => {
     if (shouldReduceMotion) return;
-    const timer = setTimeout(() => setAnimStarted(true), 400);
+    const timer = setTimeout(() => setAnimStarted(true), 100);
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
@@ -150,7 +150,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
                   height: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
                   backgroundColor: { duration: 1, delay: 0.4, times: [0, 0.5, 1] },
                 }
-              : { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.4 }
+              : { duration: 0.4, ease: [0.76, 0, 0.24, 1], delay: 0.1 }
           }
           onAnimationComplete={manejarBandaCompleta}
         >
