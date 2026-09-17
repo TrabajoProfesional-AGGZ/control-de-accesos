@@ -1,7 +1,7 @@
 import { Home, ScanLine, SlidersHorizontal } from 'lucide-react';
 import { LectorAcceso } from '../../components/LectorAcceso/LectorAcceso';
 import './ControlAccesoPage.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
 
 /** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
@@ -18,24 +18,27 @@ export function ControlAccesoPage({ onVolver }) {
   const [eventos, setEventos] = useState([]);
   const [eventoSeleccionado, setEventoSeleccionado] = useState("");
   const [cargandoEventos, setCargandoEventos] = useState(true);
-  useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        setCargandoEventos(true);
-        const data = await getEventosActivos();
-        // GET /api/v1/eventos ya excluye eventos vencidos (ver microservicio-club/CLAUDE.md,
-        // feature LOGICA DE ENTRADAS PARA EVENTOS PASADOS), pero puede seguir trayendo eventos
-        // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
-        setEventos(data.filter((evento) => evento.dia === hoyISO()));
-      } catch (error) {
-        console.error("Error al cargar eventos:", error);
-      } finally {
-        setCargandoEventos(false);
-      }
-    };
+  const [errorEventos, setErrorEventos] = useState(false);
 
-    fetchEventos();
+  const fetchEventos = useCallback(async () => {
+    try {
+      setCargandoEventos(true);
+      setErrorEventos(false);
+      const data = await getEventosActivos();
+      // GET /api/v1/eventos ya excluye eventos vencidos, pero puede seguir trayendo eventos
+      // futuros. Acá solo se puede elegir un evento del día de hoy (ni antes ni después).
+      setEventos(data.filter((evento) => evento.dia === hoyISO()));
+    } catch (error) {
+      console.error("Error al cargar eventos:", error);
+      setErrorEventos(true);
+    } finally {
+      setCargandoEventos(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchEventos();
+  }, [fetchEventos]);
 
   return (
     <div className="control-acceso-page">
@@ -61,7 +64,6 @@ export function ControlAccesoPage({ onVolver }) {
             type="button"
             role="radio"
             aria-checked={eventoSeleccionado === ''}
-            disabled={cargandoEventos}
             onClick={() => setEventoSeleccionado('')}
             className={`modo-operacion-chip${eventoSeleccionado === '' ? ' modo-operacion-chip--selected' : ''}`}
           >
@@ -73,15 +75,24 @@ export function ControlAccesoPage({ onVolver }) {
               type="button"
               role="radio"
               aria-checked={eventoSeleccionado === evento.id}
-              disabled={cargandoEventos}
               onClick={() => setEventoSeleccionado(evento.id)}
               className={`modo-operacion-chip${eventoSeleccionado === evento.id ? ' modo-operacion-chip--selected' : ''}`}
             >
               Validar entrada: {evento.nombre}
             </button>
           ))}
+          {cargandoEventos && (
+            <span className="modo-operacion-chip modo-operacion-chip--skeleton" aria-hidden="true" />
+          )}
         </div>
-        {cargandoEventos && <span className="modo-operacion-loading">Cargando eventos...</span>}
+        {errorEventos && !cargandoEventos && (
+          <p className="modo-operacion-error" role="alert">
+            No se pudieron cargar los eventos de hoy.{' '}
+            <button type="button" className="modo-operacion-reintentar" onClick={fetchEventos}>
+              Reintentar
+            </button>
+          </p>
+        )}
       </div>
 
       <LectorAcceso idEvento={eventoSeleccionado} />
