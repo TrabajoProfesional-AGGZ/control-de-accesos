@@ -66,7 +66,7 @@ describe('LectorAcceso', () => {
     expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/validar', 'POST', {
       qr_data: 'socio-123|123456',
     });
-    expect(screen.getByText('Acceso permitido')).toBeInTheDocument();
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
     // El estado financiero es el "motivo del rechazo": no corresponde mostrarlo en un acceso válido.
     expect(screen.queryByText(/Estado financiero/)).not.toBeInTheDocument();
@@ -124,11 +124,51 @@ describe('LectorAcceso', () => {
     render(<LectorAcceso />);
     await simularEscaneo('socio-123|123456');
 
-    expect(screen.getByText('Acceso permitido')).toBeInTheDocument();
+    expect(screen.getByText('Permitido')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Ok' }));
 
-    expect(screen.queryByText('Acceso permitido')).not.toBeInTheDocument();
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
+    const scanner = ultimaInstanciaDelScanner();
+    expect(scanner.resume).toHaveBeenCalled();
+  });
+
+  test('el botón "Ok" tiene el foco al aparecer el resultado', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    expect(screen.getByRole('button', { name: 'Ok' })).toHaveFocus();
+  });
+
+  test('tocar el overlay (no el botón) también cierra el resultado y reanuda', async () => {
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        status: 'ingreso_aprobado',
+        socio_id: 'socio-123',
+        nombre: 'Juan Pérez',
+        estado_financiero: 'Activo',
+        mensaje: 'Acceso permitido. Molinete liberado.',
+      }),
+    });
+
+    render(<LectorAcceso />);
+    await simularEscaneo('socio-123|123456');
+
+    fireEvent.click(screen.getByRole('alert'));
+
+    expect(screen.queryByText('Permitido')).not.toBeInTheDocument();
     const scanner = ultimaInstanciaDelScanner();
     expect(scanner.resume).toHaveBeenCalled();
   });

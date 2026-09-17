@@ -139,6 +139,9 @@ export const LectorAcceso = ({ idEvento }) => {
     }
   };
 
+  // Eyebrow por defecto (ingreso normal); W1 lo vuelve dinámico según el evento seleccionado.
+  const eyebrow = 'Ingreso al club';
+
   return (
     <div className="lector-container">
       <div className="lector-camara-wrapper">
@@ -157,32 +160,47 @@ export const LectorAcceso = ({ idEvento }) => {
             <p>Validando credencial...</p>
           </div>
         )}
-      </div>
 
-      {resultado.tipo && (
-        <div
-          className={`lector-resultado lector-resultado--${resultado.tipo}`}
-          role="alert"
-        >
-          {resultado.tipo === 'exito' ? (
-            <CheckCircle2 size={48} className="lector-resultado-icono" />
-          ) : (
-            <XCircle size={48} className="lector-resultado-icono" />
-          )}
-          <h3 className="lector-resultado-mensaje">{resultado.mensaje}</h3>
-          {resultado.nombre && (
-            <p className="lector-resultado-nombre">{resultado.nombre}</p>
-          )}
-          {resultado.tipo === 'error' && resultado.estadoFinanciero && (
-            <p className="lector-resultado-estado-financiero">
-              Estado financiero: {resultado.estadoFinanciero}
+        {resultado.tipo && (
+          <div
+            className={`lector-overlay lector-resultado lector-resultado--${resultado.tipo}`}
+            role="alert"
+            onClick={cerrarResultado}
+          >
+            <p className="lector-resultado-eyebrow">{eyebrow}</p>
+            {resultado.tipo === 'exito' ? (
+              <CheckCircle2 size={64} className="lector-resultado-icono" aria-hidden="true" />
+            ) : (
+              <XCircle size={64} className="lector-resultado-icono" aria-hidden="true" />
+            )}
+            <p className="lector-resultado-veredicto">
+              {resultado.tipo === 'exito' ? 'Permitido' : 'Rechazado'}
             </p>
-          )}
-          <button className="lector-resultado-ok" onClick={cerrarResultado}>
-            Ok
-          </button>
-        </div>
-      )}
+            {resultado.nombre && (
+              <h3 className="lector-resultado-nombre">{resultado.nombre}</h3>
+            )}
+            {resultado.tipo === 'error' && (
+              <p className="lector-resultado-mensaje">{resultado.mensaje}</p>
+            )}
+            {resultado.tipo === 'error' && resultado.estadoFinanciero && (
+              <p className="lector-resultado-estado-financiero">
+                Estado financiero: {resultado.estadoFinanciero}
+              </p>
+            )}
+            <button
+              type="button"
+              className="lector-resultado-ok"
+              onClick={(e) => {
+                e.stopPropagation();
+                cerrarResultado();
+              }}
+              autoFocus
+            >
+              Ok
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
