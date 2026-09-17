@@ -1,6 +1,7 @@
 .home-page {
   position: relative;
   padding: var(--space-6) var(--space-4) var(--space-6);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
   max-width: 800px;
   margin: 0 auto;
   display: flex;
