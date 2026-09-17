@@ -59,7 +59,14 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     qrCode
       .start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 4 / 3 },
+        {
+          fps: 10,
+          qrbox: (w, h) => {
+            const s = Math.round(Math.min(w, h) * 0.72);
+            return { width: s, height: s };
+          },
+          aspectRatio: 4 / 3,
+        },
         onScanSuccess,
         onScanFailure
       )
