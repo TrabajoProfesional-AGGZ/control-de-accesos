@@ -37,6 +37,7 @@
   align-items: center;
   flex-shrink: 0;
   border-radius: var(--radius-full);
+  color: var(--color-text-primary);
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 

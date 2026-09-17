@@ -24,7 +24,7 @@ button.csf-overlay {
 }
 
 .csf-outer-card {
-  background-color: #f0f0f0;
+  background-color: var(--color-surface);
   border-radius: var(--radius-xl);
   padding: 28px 28px 24px;
   max-height: 90dvh;
@@ -187,7 +187,7 @@ button.csf-overlay {
 }
 
 .csf-input::placeholder {
-  color: #c0c0c0;
+  color: var(--color-text-placeholder);
 }
 
 .csf-select {
@@ -215,8 +215,8 @@ button.csf-overlay {
 
 /* Error global en el formulario */
 .csf-form-error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
@@ -326,6 +326,12 @@ button.csf-overlay {
   margin: 0 auto;
 }
 
+/* TODO D1: mapear a --text-heading cuando exista la escala tipográfica. */
+.csf-success-texto {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
 .csf-success-logo-circle {
   width: 80px;
   height: 80px;
@@ -399,7 +405,7 @@ button.csf-overlay {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #0D6E0D;
+  color: var(--status-success-border);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -409,7 +415,7 @@ button.csf-overlay {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #0D6E0D;
+  color: var(--status-success-border);
   font-weight: 500;
   margin-top: 6px;
 }
