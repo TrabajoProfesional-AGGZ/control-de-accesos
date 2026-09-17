@@ -80,6 +80,16 @@ describe('LectorAcceso', () => {
     expect(scanner.pause).toHaveBeenCalledWith();
   });
 
+  test('muestra el badge "Ingreso normal" sin evento', () => {
+    render(<LectorAcceso />);
+    expect(screen.getByText('Ingreso normal')).toBeInTheDocument();
+  });
+
+  test('muestra "Entrada · X" con nombreEvento', () => {
+    render(<LectorAcceso idEvento="uuid-del-evento-999" nombreEvento="Partido de Verano" />);
+    expect(screen.getByText('Entrada · Partido de Verano')).toBeInTheDocument();
+  });
+
   test('vibra al decodificar y al mostrar el resultado de éxito', async () => {
     fetchTo.mockResolvedValueOnce({
       ok: true,

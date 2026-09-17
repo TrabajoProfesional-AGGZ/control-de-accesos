@@ -2,27 +2,18 @@ import { useEffect, useState, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { CheckCircle2, XCircle, CameraOff } from 'lucide-react';
 import { fetchTo } from '../../utils/utils';
+import { vibrar } from '../../utils/haptics';
 import './LectorAcceso.css';
 
 const ESTADO_INICIAL = { tipo: null, mensaje: '', nombre: null, estadoFinanciero: null };
-
-/** Háptico: se ignora en iOS (sin API) y en Chrome sin activación previa. */
-function vibrar(patron) {
-  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-    try {
-      navigator.vibrate(patron);
-    } catch {
-      // no-op
-    }
-  }
-}
 
 /**
  * Lector de QR de acceso: arranca la cámara al montar, valida cada escaneo
  * contra `ms-acceso` y muestra el resultado superpuesto sobre la cámara.
  * @param {string} idEvento - id del evento a validar contra la entrada del socio (vacío = ingreso normal al club).
+ * @param {string} nombreEvento - nombre del evento seleccionado ('' = ingreso normal al club).
  */
-export const LectorAcceso = ({ idEvento }) => {
+export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const [resultado, setResultado] = useState(ESTADO_INICIAL);
   const [validando, setValidando] = useState(false);
   const [errorCamara, setErrorCamara] = useState(false);
@@ -159,13 +150,19 @@ export const LectorAcceso = ({ idEvento }) => {
     }
   };
 
-  // Eyebrow por defecto (ingreso normal); W1 lo vuelve dinámico según el evento seleccionado.
-  const eyebrow = 'Ingreso al club';
+  const eyebrow = nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso al club';
 
   return (
     <div className="lector-container">
       <div className="lector-camara-wrapper">
         <div id="qr-reader" className={`lector-camara${leido ? ' lector-camara--leido' : ''}`} />
+
+        <span
+          className={`lector-modo${nombreEvento ? ' lector-modo--evento' : ''}`}
+          aria-live="polite"
+        >
+          {nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso normal'}
+        </span>
 
         {errorCamara && (
           <div className="lector-overlay lector-overlay--error" role="alert">

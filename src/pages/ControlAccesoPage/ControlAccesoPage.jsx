@@ -3,6 +3,7 @@ import { LectorAcceso } from '../../components/LectorAcceso/LectorAcceso';
 import './ControlAccesoPage.css';
 import { useState, useEffect, useCallback } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
+import { vibrar } from '../../utils/haptics';
 
 /** Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. */
 function hoyISO() {
@@ -40,6 +41,8 @@ export function ControlAccesoPage({ onVolver }) {
     fetchEventos();
   }, [fetchEventos]);
 
+  const nombreEvento = eventos.find((e) => e.id === eventoSeleccionado)?.nombre ?? '';
+
   return (
     <div className="control-acceso-page">
       <div className="control-acceso-banner banner-oscuro">
@@ -49,9 +52,6 @@ export function ControlAccesoPage({ onVolver }) {
           <ScanLine size={22} className="control-acceso-banner-icono" aria-hidden="true" />
           <h1>Control de Acceso</h1>
         </div>
-        <p className="control-acceso-banner-subtitulo">
-          Escaneá el QR del socio para validar su ingreso
-        </p>
       </div>
 
       <div className={`modo-operacion${eventoSeleccionado ? ' modo-operacion--evento' : ''}`}>
@@ -64,7 +64,10 @@ export function ControlAccesoPage({ onVolver }) {
             type="button"
             role="radio"
             aria-checked={eventoSeleccionado === ''}
-            onClick={() => setEventoSeleccionado('')}
+            onClick={() => {
+              vibrar(15);
+              setEventoSeleccionado('');
+            }}
             className={`modo-operacion-chip${eventoSeleccionado === '' ? ' modo-operacion-chip--selected' : ''}`}
           >
             Ingreso normal al club
@@ -75,7 +78,10 @@ export function ControlAccesoPage({ onVolver }) {
               type="button"
               role="radio"
               aria-checked={eventoSeleccionado === evento.id}
-              onClick={() => setEventoSeleccionado(evento.id)}
+              onClick={() => {
+                vibrar(15);
+                setEventoSeleccionado(evento.id);
+              }}
               className={`modo-operacion-chip${eventoSeleccionado === evento.id ? ' modo-operacion-chip--selected' : ''}`}
             >
               Validar entrada: {evento.nombre}
@@ -95,7 +101,7 @@ export function ControlAccesoPage({ onVolver }) {
         )}
       </div>
 
-      <LectorAcceso idEvento={eventoSeleccionado} />
+      <LectorAcceso idEvento={eventoSeleccionado} nombreEvento={nombreEvento} />
 
       <button
         onClick={onVolver}

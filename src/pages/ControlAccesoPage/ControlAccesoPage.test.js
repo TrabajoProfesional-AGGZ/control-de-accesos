@@ -6,7 +6,11 @@ import { getEventosActivos } from '../../services/eventosService';
 jest.mock('../../services/eventosService');
 
 jest.mock('../../components/LectorAcceso/LectorAcceso', () => ({
-  LectorAcceso: ({ idEvento }) => <div data-testid="lector-mock">Evento ID: {idEvento}</div>
+  LectorAcceso: ({ idEvento, nombreEvento }) => (
+    <div data-testid="lector-mock">
+      Evento ID: {idEvento} · Nombre: {nombreEvento}
+    </div>
+  ),
 }));
 
 function hoyISO() {
@@ -40,6 +44,7 @@ describe('ControlAccesoPage - Selección de Eventos', () => {
     await userEvent.click(chipEvento);
 
     expect(screen.getByTestId('lector-mock')).toHaveTextContent('Evento ID: evento-123');
+    expect(screen.getByTestId('lector-mock')).toHaveTextContent('Nombre: Partido de Verano');
     expect(chipEvento).toHaveAttribute('aria-checked', 'true');
   });
 
