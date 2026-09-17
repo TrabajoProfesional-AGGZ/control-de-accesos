@@ -42,8 +42,8 @@ export function ControlAccesoPage({ onVolver }) {
 
   return (
     <div className="control-acceso-page">
-      <div className="control-acceso-banner">
-        <div className="control-acceso-banner-texture" aria-hidden="true" />
+      <div className="control-acceso-banner banner-oscuro">
+        <div className="banner-oscuro-textura" aria-hidden="true" />
 
         <div className="control-acceso-banner-titulo">
           <ScanLine size={22} className="control-acceso-banner-icono" aria-hidden="true" />

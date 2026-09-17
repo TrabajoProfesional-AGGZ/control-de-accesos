@@ -10,8 +10,8 @@ export function WelcomeCard({ empleado }) {
   }).format(new Date());
 
   return (
-    <section className="welcome-card">
-      <div className="welcome-card-texture" aria-hidden="true" />
+    <section className="welcome-card banner-oscuro">
+      <div className="banner-oscuro-textura" aria-hidden="true" />
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
       </div>

@@ -6,6 +6,31 @@ body {
   color: var(--color-text-primary);
 }
 
+/* Banner oscuro compartido por WelcomeCard y ControlAccesoPage. 
+   Los hex del gradiente son los que la rama demo retunea por club
+  ahora viven en un solo lugar. */
+.banner-oscuro {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 140% at 12% -10%, #3a3a3a 0%, transparent 55%),
+    linear-gradient(155deg, #1c1c1c 0%, #111111 42%, #0a0a0a 100%);
+  color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.banner-oscuro-textura {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url('./assets/grain.png');
+}
+
 /* ================= LOGIN ================= */
 .login-container {
   position: relative;
