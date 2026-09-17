@@ -145,7 +145,7 @@ export const LectorAcceso = ({ idEvento }) => {
         <div id="qr-reader" className="lector-camara" />
 
         {errorCamara && (
-          <div className="lector-overlay lector-overlay--error">
+          <div className="lector-overlay lector-overlay--error" role="alert">
             <CameraOff size={48} className="lector-overlay-icono" />
             <h3 className="lector-overlay-mensaje">No se pudo acceder a la cámara</h3>
             <p className="lector-overlay-nombre">Revisá los permisos de cámara del navegador.</p>
@@ -153,7 +153,7 @@ export const LectorAcceso = ({ idEvento }) => {
         )}
 
         {validando && (
-          <div className="lector-overlay lector-overlay--validando">
+          <div className="lector-overlay lector-overlay--validando" aria-live="polite">
             <p>Validando credencial...</p>
           </div>
         )}
@@ -162,7 +162,7 @@ export const LectorAcceso = ({ idEvento }) => {
       {resultado.tipo && (
         <div
           className={`lector-resultado lector-resultado--${resultado.tipo}`}
-          role="status"
+          role="alert"
         >
           {resultado.tipo === 'exito' ? (
             <CheckCircle2 size={48} className="lector-resultado-icono" />

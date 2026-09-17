@@ -100,7 +100,6 @@ export function ControlAccesoPage({ onVolver }) {
       <button
         onClick={onVolver}
         className="control-acceso-home-btn"
-        aria-label="Ir a la página principal"
       >
         <Home size={20} />
         Ir al inicio

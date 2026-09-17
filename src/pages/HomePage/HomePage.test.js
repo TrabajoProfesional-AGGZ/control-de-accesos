@@ -51,7 +51,7 @@ describe('HomePage', () => {
     expect(screen.getByRole('heading', { name: 'Control de Acceso' })).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido, Carlos Gomez')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /ir a la página principal/i }));
+    fireEvent.click(screen.getByRole('button', { name: /ir al inicio/i }));
 
     expect(screen.getByText('Bienvenido, Carlos Gomez')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Control de Acceso' })).not.toBeInTheDocument();
