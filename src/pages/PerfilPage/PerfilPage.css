@@ -114,8 +114,10 @@
   transition: background-color var(--transition-normal);
 }
 
-.perfil-cambiar-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .perfil-cambiar-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .perfil-cambiar-button:active {
@@ -163,9 +165,11 @@
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
-.perfil-cerrar-sesion:hover {
-  background-color: var(--status-error-surface-bg);
-  border-color: var(--status-danger-border);
+@media (hover: hover) {
+  .perfil-cerrar-sesion:hover {
+    background-color: var(--status-error-surface-bg);
+    border-color: var(--status-danger-border);
+  }
 }
 
 .perfil-cerrar-sesion:active {

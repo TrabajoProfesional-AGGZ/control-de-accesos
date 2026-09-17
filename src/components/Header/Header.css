@@ -40,8 +40,10 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.app-header-perfil:hover {
-  background-color: var(--color-bg-subtle);
+@media (hover: hover) {
+  .app-header-perfil:hover {
+    background-color: var(--color-bg-subtle);
+  }
 }
 
 .app-header-perfil:active {

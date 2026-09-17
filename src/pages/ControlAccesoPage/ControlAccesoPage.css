@@ -142,9 +142,11 @@
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.modo-operacion-chip:hover:not(:disabled):not(.modo-operacion-chip--selected) {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .modo-operacion-chip:hover:not(:disabled):not(.modo-operacion-chip--selected) {
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
 }
 
 .modo-operacion-chip:focus-visible {

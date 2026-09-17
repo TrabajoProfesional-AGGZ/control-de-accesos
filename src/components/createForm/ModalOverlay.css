@@ -261,9 +261,11 @@ button.csf-overlay {
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-btn-back:hover {
-  border-color: var(--color-text-secondary);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-btn-back:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
 }
 
 .csf-btn-next,
@@ -285,17 +287,21 @@ button.csf-overlay {
   background-color: var(--color-text-primary);
 }
 
-.csf-btn-next:hover,
-.csf-btn-submit:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .csf-btn-next:hover,
+  .csf-btn-submit:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .csf-btn-danger {
   background-color: var(--color-danger);
 }
 
-.csf-btn-danger:hover:not(:disabled) {
-  background-color: var(--color-danger-hover);
+@media (hover: hover) {
+  .csf-btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger-hover);
+  }
 }
 
 /* Spinner */
@@ -363,8 +369,10 @@ button.csf-overlay {
   user-select: none;
 }
 
-.csf-checkbox-label:hover {
-  background-color: #ebebeb;
+@media (hover: hover) {
+  .csf-checkbox-label:hover {
+    background-color: #ebebeb;
+  }
 }
 
 .csf-checkbox-input {
@@ -440,8 +448,10 @@ button.csf-overlay {
   transition: background-color var(--transition-fast);
 }
 
-.csf-btn-agregar-socio:hover:not(:disabled) {
-  background-color: #333333;
+@media (hover: hover) {
+  .csf-btn-agregar-socio:hover:not(:disabled) {
+    background-color: #333333;
+  }
 }
 
 .csf-btn-agregar-socio:disabled {
@@ -481,8 +491,10 @@ button.csf-overlay {
   transition: color var(--transition-fast);
 }
 
-.csf-socio-chip-remove:hover {
-  color: var(--color-danger);
+@media (hover: hover) {
+  .csf-socio-chip-remove:hover {
+    color: var(--color-danger);
+  }
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

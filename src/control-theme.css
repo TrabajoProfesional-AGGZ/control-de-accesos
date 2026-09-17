@@ -171,8 +171,10 @@ body {
   transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
-.su-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .su-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .su-button:active:not(:disabled) {
