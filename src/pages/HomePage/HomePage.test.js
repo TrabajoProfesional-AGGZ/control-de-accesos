@@ -29,7 +29,7 @@ const empleado = {
 describe('HomePage', () => {
   test('muestra el banner de bienvenida con los datos del empleado, sin estado financiero', () => {
     render(<HomePage empleado={empleado} cerrarSesion={jest.fn()} />);
-    expect(screen.getByText('Bienvenido Carlos Gomez')).toBeInTheDocument();
+    expect(screen.getByText('Bienvenido, Carlos Gomez')).toBeInTheDocument();
     expect(screen.getByText('Legajo 1000')).toBeInTheDocument();
     expect(screen.queryByText(/estado/i)).not.toBeInTheDocument();
   });
@@ -40,7 +40,7 @@ describe('HomePage', () => {
     expect(screen.getByRole('button', { name: /cerrar sesión/i })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /mi perfil/i }));
-    expect(screen.getByText('Bienvenido Carlos Gomez')).toBeInTheDocument();
+    expect(screen.getByText('Bienvenido, Carlos Gomez')).toBeInTheDocument();
   });
 
   test('el botón "Escanear QR de socio" navega a la pantalla de Control de Acceso y "Ir al inicio" regresa al inicio', () => {
@@ -49,11 +49,11 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByRole('button', { name: /escanear qr de socio/i }));
 
     expect(screen.getByRole('heading', { name: 'Control de Acceso' })).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Carlos Gomez')).not.toBeInTheDocument();
+    expect(screen.queryByText('Bienvenido, Carlos Gomez')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /ir a la página principal/i }));
 
-    expect(screen.getByText('Bienvenido Carlos Gomez')).toBeInTheDocument();
+    expect(screen.getByText('Bienvenido, Carlos Gomez')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Control de Acceso' })).not.toBeInTheDocument();
   });
 });

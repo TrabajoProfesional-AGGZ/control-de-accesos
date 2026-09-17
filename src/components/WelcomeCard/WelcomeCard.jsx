@@ -15,7 +15,7 @@ export function WelcomeCard({ empleado }) {
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
       </div>
-      <h1 className="welcome-card-saludo">Bienvenido {empleado.nombre} {empleado.apellido}</h1>
+      <h1 className="welcome-card-saludo">Bienvenido, {empleado.nombre} {empleado.apellido}</h1>
       <p className="welcome-card-membresia">Legajo {empleado.legajo}</p>
     </section>
   );
