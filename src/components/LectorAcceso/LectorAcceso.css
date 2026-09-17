@@ -67,6 +67,13 @@
   font-weight: 600;
 }
 
+.lector-overlay-secundario {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
 /* Copiado de ModalOverlay.css (.csf-spinner) para no acoplar el lector al shell de modales. */
 .csf-spinner {
   width: 16px;

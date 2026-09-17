@@ -94,6 +94,39 @@ describe('LectorAcceso', () => {
     await waitFor(() => expect(startMock).toHaveBeenCalledTimes(2));
   });
 
+  test('a los 3s de validar aparece el texto de tardanza', async () => {
+    jest.useFakeTimers();
+    let resolverFetch;
+    fetchTo.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolverFetch = resolve;
+      })
+    );
+
+    render(<LectorAcceso />);
+    const scanner = ultimaInstanciaDelScanner();
+    act(() => {
+      scanner.onScanSuccess('socio-123|123456');
+    });
+
+    expect(screen.queryByText('Está tardando más de lo normal.')).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    expect(screen.getByText('Está tardando más de lo normal.')).toBeInTheDocument();
+
+    await act(async () => {
+      resolverFetch({
+        ok: true,
+        json: async () => ({ nombre: 'Juan Pérez', estado_financiero: 'Activo' }),
+      });
+    });
+
+    jest.useRealTimers();
+  });
+
   test('acceso válido: muestra el nombre del socio debajo de la cámara', async () => {
     fetchTo.mockResolvedValueOnce({
       ok: true,

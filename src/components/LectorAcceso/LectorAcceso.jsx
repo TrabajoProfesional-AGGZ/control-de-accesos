@@ -45,6 +45,7 @@ function clasificarErrorCamara(err) {
 export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const [resultado, setResultado] = useState(ESTADO_INICIAL);
   const [validando, setValidando] = useState(false);
+  const [validandoLento, setValidandoLento] = useState(false);
   const [errorCamara, setErrorCamara] = useState(null);
   const [leido, setLeido] = useState(false);
   const [camaraLista, setCamaraLista] = useState(false);
@@ -53,6 +54,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const validandoRef = useRef(false);
   const idEventoRef = useRef(idEvento);
   const leidoTimeoutRef = useRef(null);
+  const validandoLentoTimeoutRef = useRef(null);
   const iniciarRef = useRef(null);
 
   useEffect(() => {
@@ -131,6 +133,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
         // el escáner puede no estar corriendo todavía si el usuario escanea muy rápido
       }
       setValidando(true);
+      validandoLentoTimeoutRef.current = setTimeout(() => setValidandoLento(true), 3000);
 
       try {
         const payload = {qr_data: decodedText};
@@ -171,7 +174,9 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
           estadoFinanciero: null,
         });
       } finally {
+        clearTimeout(validandoLentoTimeoutRef.current);
         setValidando(false);
+        setValidandoLento(false);
       }
     }
 
@@ -183,6 +188,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
       cancelado = true;
       detener();
       clearTimeout(leidoTimeoutRef.current);
+      clearTimeout(validandoLentoTimeoutRef.current);
       window.removeEventListener('unhandledrejection', ignorarAbortDePlayInterrumpido);
     };
   }, []);
@@ -238,7 +244,11 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
 
         {validando && (
           <div className="lector-overlay lector-overlay--validando" aria-live="polite">
-            <p>Validando credencial...</p>
+            <span className="csf-spinner" aria-hidden="true" />
+            <p>Validando credencial…</p>
+            {validandoLento && (
+              <p className="lector-overlay-secundario">Está tardando más de lo normal.</p>
+            )}
           </div>
         )}
 
