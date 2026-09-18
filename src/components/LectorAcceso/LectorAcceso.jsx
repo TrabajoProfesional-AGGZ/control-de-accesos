@@ -40,7 +40,8 @@ function clasificarErrorCamara(err) {
 
 /**
  * Lector de QR de acceso: arranca la cámara al montar, valida cada escaneo
- * contra `ms-acceso` y muestra el resultado superpuesto sobre la cámara.
+ * contra `ms-acceso` y muestra el resultado en una tarjeta debajo de la
+ * cámara (se cierra sola a los 3s o con el botón "Ok").
  * @param {string} idEvento - id del evento a validar contra la entrada del socio (vacío = ingreso normal al club).
  * @param {string} nombreEvento - nombre del evento seleccionado ('' = ingreso normal al club).
  */
@@ -61,6 +62,7 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
   const idEventoRef = useRef(idEvento);
   const leidoTimeoutRef = useRef(null);
   const validandoLentoTimeoutRef = useRef(null);
+  const resultadoTimeoutRef = useRef(null);
   const iniciarRef = useRef(null);
   const ultimoQrRef = useRef({ texto: null, hasta: 0 });
 
@@ -105,10 +107,6 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
           { facingMode: 'environment' },
           {
             fps: 10,
-            qrbox: (w, h) => {
-              const s = Math.round(Math.min(w, h) * 0.72);
-              return { width: s, height: s };
-            },
             aspectRatio: 4 / 3,
           },
           onScanSuccess,
@@ -239,6 +237,12 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
     }
   };
 
+  useEffect(() => {
+    if (!resultado.tipo) return;
+    resultadoTimeoutRef.current = setTimeout(cerrarResultado, 3000);
+    return () => clearTimeout(resultadoTimeoutRef.current);
+  }, [resultado.tipo]);
+
   const eyebrow = nombreEvento ? `Entrada · ${nombreEvento}` : 'Ingreso al club';
 
   function alternarSilencio() {
@@ -306,46 +310,47 @@ export const LectorAcceso = ({ idEvento, nombreEvento = '' }) => {
           </div>
         )}
 
-        {resultado.tipo && (
-          <div
-            className={`lector-overlay lector-resultado lector-resultado--${resultado.tipo}`}
-            role="alert"
-            onClick={cerrarResultado}
-          >
-            <p className="lector-resultado-eyebrow">{eyebrow}</p>
-            {resultado.tipo === 'exito' ? (
-              <CheckCircle2 size={64} className="lector-resultado-icono" aria-hidden="true" />
-            ) : (
-              <XCircle size={64} className="lector-resultado-icono" aria-hidden="true" />
-            )}
-            <p className="lector-resultado-veredicto">
-              {resultado.tipo === 'exito' ? 'Permitido' : 'Rechazado'}
-            </p>
-            {resultado.nombre && (
-              <h3 className="lector-resultado-nombre">{resultado.nombre}</h3>
-            )}
-            {resultado.tipo === 'error' && (
-              <p className="lector-resultado-mensaje">{resultado.mensaje}</p>
-            )}
-            {resultado.tipo === 'error' && resultado.estadoFinanciero && (
-              <p className="lector-resultado-estado-financiero">
-                Estado financiero: {resultado.estadoFinanciero}
-              </p>
-            )}
-            <button
-              type="button"
-              className="lector-resultado-ok"
-              onClick={(e) => {
-                e.stopPropagation();
-                cerrarResultado();
-              }}
-              autoFocus
-            >
-              Ok
-            </button>
-          </div>
-        )}
       </div>
+
+      {resultado.tipo && (
+        <div
+          className={`lector-resultado lector-resultado--${resultado.tipo}`}
+          role="alert"
+          onClick={cerrarResultado}
+        >
+          <p className="lector-resultado-eyebrow">{eyebrow}</p>
+          {resultado.tipo === 'exito' ? (
+            <CheckCircle2 size={64} className="lector-resultado-icono" aria-hidden="true" />
+          ) : (
+            <XCircle size={64} className="lector-resultado-icono" aria-hidden="true" />
+          )}
+          <p className="lector-resultado-veredicto">
+            {resultado.tipo === 'exito' ? 'Permitido' : 'Rechazado'}
+          </p>
+          {resultado.nombre && (
+            <h3 className="lector-resultado-nombre">{resultado.nombre}</h3>
+          )}
+          {resultado.tipo === 'error' && (
+            <p className="lector-resultado-mensaje">{resultado.mensaje}</p>
+          )}
+          {resultado.tipo === 'error' && resultado.estadoFinanciero && (
+            <p className="lector-resultado-estado-financiero">
+              Estado financiero: {resultado.estadoFinanciero}
+            </p>
+          )}
+          <button
+            type="button"
+            className="lector-resultado-ok"
+            onClick={(e) => {
+              e.stopPropagation();
+              cerrarResultado();
+            }}
+            autoFocus
+          >
+            Ok
+          </button>
+        </div>
+      )}
     </div>
   );
 };
