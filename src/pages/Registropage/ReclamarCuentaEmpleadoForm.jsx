@@ -131,6 +131,8 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         setError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
       } else if (err.message === 'validacion-vencida') {
         setError('La validación expiró. Volvé a empezar el registro.');
+      } else if (err.message === 'club-desconocido') {
+        setError('No pudimos identificar el club de este sitio. Avisale al administrador.');
       } else if (err.code === 'auth/email-already-in-use') {
         setError('El email ya está en uso. Por favor, iniciá sesión.');
       } else {
