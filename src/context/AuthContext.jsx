@@ -1,8 +1,30 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth } from '../firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, getIdTokenResult } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
+import { idDeClubActual } from '../services/clubService';
 import { AuthContext } from './authContextObject';
+
+/**
+ * Compara el claim `club_id` del token contra el club de este dominio (resuelto por hostname).
+ * Sin este chequeo, loguearse con la cuenta de un empleado de otro club dejaría validando
+ * accesos y operando sobre los datos reales de ESE club mientras la pantalla muestra la marca de
+ * este dominio: el club que resuelve `ClubContext` es puramente cosmético.
+ *
+ * Devuelve `true` también cuando el club de este dominio no se pudo resolver (catálogo caído):
+ * no hay nada contra qué comparar, y bloquear el login ahí sería más agresivo que lo que hace
+ * `ClubProvider`, que tampoco frena el render en ese caso.
+ */
+async function clubDelTokenCoincide(firebaseUser) {
+  let clubDelDominio;
+  try {
+    clubDelDominio = await idDeClubActual();
+  } catch {
+    return true;
+  }
+  const { claims } = await getIdTokenResult(firebaseUser);
+  return !claims.club_id || claims.club_id === clubDelDominio;
+}
 
 /**
  * Escucha el estado de sesión de Firebase y, si hay usuario logueado,
@@ -36,6 +58,12 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        if (!(await clubDelTokenCoincide(firebaseUser))) {
+          setEmpleado(null);
+          setAuthError('Credenciales invalidas');
+          setCargandoAuth(false);
+          return;
+        }
         await cargarEmpleado(firebaseUser);
       } else {
         setEmpleado(null);
