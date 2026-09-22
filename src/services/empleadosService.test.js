@@ -6,17 +6,25 @@ jest.mock('../utils/utils', () => ({
   fetchWithOutAuth: jest.fn(),
 }));
 
+// Las rutas pre-login llevan el club en el path y lo sacan del resolutor, no de un parámetro.
+jest.mock('./clubService', () => ({
+  idDeClubActual: jest.fn(async () => 'club-uno'),
+}));
+import { idDeClubActual } from './clubService';
+
 describe('empleadosService', () => {
   beforeEach(() => {
     fetchTo.mockClear();
     fetchWithOutAuth.mockClear();
+    idDeClubActual.mockClear();
+    idDeClubActual.mockResolvedValue('club-uno');
   });
 
   describe('validarEmpleado', () => {
     test('devuelve el empleado si la validación es exitosa', async () => {
       fetchWithOutAuth.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ legajo: '1000' }) });
       const resultado = await validarEmpleado('1000', 'a@a.com', '111');
-      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/empleados/validar', 'POST', {
+      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/clubes/club-uno/empleados/validar', 'POST', {
         legajo: '1000',
         mail: 'a@a.com',
         dni: '111',
@@ -82,6 +90,23 @@ describe('empleadosService', () => {
     test('lanza "empleado-no-encontrado" en 404', async () => {
       fetchWithOutAuth.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(obtenerMailPorLegajo('no-existe')).rejects.toThrow('empleado-no-encontrado');
+    });
+
+    test('pide el mail al club del dominio, con el legajo codificado', async () => {
+      fetchWithOutAuth.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ mail: 'a@a.com' }) });
+      await obtenerMailPorLegajo('legajo con espacio');
+      expect(fetchWithOutAuth).toHaveBeenCalledWith(
+        '/api/v1/clubes/club-uno/empleados/mail-por-legajo/legajo%20con%20espacio',
+        'GET',
+      );
+    });
+  });
+
+  describe('club del dominio', () => {
+    test('si el club no se puede resolver, no llega a pegarle al backend', async () => {
+      idDeClubActual.mockRejectedValueOnce(new Error('club-desconocido'));
+      await expect(validarEmpleado('1000', 'a@a.com', '111')).rejects.toThrow('club-desconocido');
+      expect(fetchWithOutAuth).not.toHaveBeenCalled();
     });
   });
 });

@@ -104,6 +104,11 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
       ];
       if (err.message === 'empleado-no-encontrado' || codigosCredencialesInvalidas.includes(err.code)) {
         setError('Credenciales incorrectas');
+      } else if (err.message === 'club-desconocido') {
+        // El legajo se resuelve contra el club de este dominio, y el catálogo no reconoce
+        // ninguno: el mensaje tiene que distinguirse de una caída, porque se arregla dando de
+        // alta el dominio y no esperando.
+        setError('No pudimos identificar el club de este sitio. Avisale al administrador.');
       } else {
         setError('Servicio no disponible');
       }
