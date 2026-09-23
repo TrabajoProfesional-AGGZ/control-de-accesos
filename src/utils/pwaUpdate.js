@@ -1,4 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
+import { logger } from './logger';
 
 let listener = null;
 
@@ -17,7 +18,7 @@ const actualizarSW = registerSW({
     listener?.();
   },
   onOfflineReady() {
-    console.log('La app ya está lista para usarse sin conexión.');
+    logger.log('La app ya está lista para usarse sin conexión.');
   },
 });
 

@@ -4,6 +4,7 @@ import { onAuthStateChanged, signOut, getIdTokenResult } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { idDeClubActual } from '../services/clubService';
 import { AuthContext } from './authContextObject';
+import { logger } from '../utils/logger';
 
 /**
  * Compara el claim `club_id` del token contra el club de este dominio (resuelto por hostname).
@@ -49,7 +50,7 @@ export function AuthProvider({ children }) {
         setAuthError('Servicio no disponible');
       }
     } catch (error) {
-      console.error('Error al recuperar el perfil del empleado:', error);
+      logger.error('Error al recuperar el perfil del empleado:', error);
       setEmpleado(null);
       setAuthError('No pudimos cargar tu perfil. Probá de nuevo en unos segundos.');
     }
