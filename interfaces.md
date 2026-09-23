@@ -8,7 +8,7 @@ nav_order: 2
 
 Aquí se documentan las pantallas principales de la Progressive Web App (PWA) de Control de Accesos orientada a empleados. 
 
-Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema Neutro** (base por defecto de SocioUnido) y el **Esquema Personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Mamelodi Sundowns** de Sudáfrica.
+Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema Neutro** (base por defecto de SocioUnido) y el **Esquema Personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Inter Miami CF** de Estados Unidos.
 
 ## Login
 
@@ -20,8 +20,8 @@ La puerta de entrada para el personal, donde los empleados ingresan sus credenci
     <img src="img/login_neutro.jpeg" alt="Login Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/login_mamelodi.jpeg" alt="Login Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/login_miami.jpeg" alt="Login Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -37,8 +37,8 @@ El panel principal (Dashboard) del empleado, desde donde puede acceder rápidame
     <img src="img/home_neutro.jpeg" alt="Home Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/home_mamelodi.jpeg" alt="Home Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/home_miami.jpeg" alt="Home Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -51,10 +51,11 @@ El módulo de lectura integrado con la cámara del dispositivo móvil, encargado
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/escaner_neutro.jpg" alt="Escáner Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/escaner_neutro.jpeg" alt="Escáner Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/escaner_mamelodi.jpg" alt="Escáner Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/escaner_miami.jpeg" alt="Home Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
+
