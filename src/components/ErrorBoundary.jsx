@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { logger } from '../utils/logger';
 
 /** Captura errores de render no manejados y muestra una pantalla de fallback. */
 export class ErrorBoundary extends Component {
@@ -12,7 +13,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Error no capturado en la aplicación:', error, info.componentStack);
+    logger.error('Error no capturado en la aplicación:', error, info.componentStack);
   }
 
   render() {

@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getEventosActivos } from '../../services/eventosService';
 import { vibrar } from '../../utils/haptics';
 import { desbloquearAudio } from '../../utils/sonidos';
+import { logger } from '../../utils/logger';
 
 /**
  * Fecha de hoy en formato `YYYY-MM-DD`, para filtrar eventos del día. Recibe la fecha del
@@ -51,7 +52,7 @@ export function ControlAccesoPage({ onVolver }) {
         return actual;
       });
     } catch (error) {
-      console.error("Error al cargar eventos:", error);
+      logger.error("Error al cargar eventos:", error);
       if (!silencioso) setErrorEventos(true);
     } finally {
       if (!silencioso) setCargandoEventos(false);

@@ -1,4 +1,5 @@
 import { fetchWithOutAuth } from '../utils/utils';
+import { logger } from '../utils/logger';
 
 /**
  * De qué club es esta instalación de la PWA, resuelto por hostname.
@@ -90,7 +91,7 @@ async function pedirClub() {
 
   const deDesarrollo = clubDeDesarrollo();
   if (deDesarrollo) {
-    console.warn(
+    logger.warn(
       `No se pudo resolver el club de "${host}" (${fallo.message}); se usa VITE_APP_CLUB_ID.`,
     );
     clubResuelto = deDesarrollo;

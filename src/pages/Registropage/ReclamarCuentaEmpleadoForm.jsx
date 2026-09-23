@@ -7,6 +7,7 @@ import { validarEmpleado, reclamarCuentaEmpleado } from '../../services/empleado
 import { asignarTipoClaim } from '../../services/authClaimsService';
 import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura, validarFortalezaPassword } from '../../utils/formValidators';
+import { logger } from '../../utils/logger';
 import logoSocio from '../../assets/logo_socio.png';
 import '../../control-theme.css';
 import '../../components/createForm/ModalOverlay.css';
@@ -120,7 +121,7 @@ export function ReclamarCuentaEmpleadoForm({ onSuccess, onCancel }) {
         try {
           await deleteUser(usuarioCreado);
         } catch (rollbackErr) {
-          console.error('Error crítico al intentar hacer rollback:', rollbackErr);
+          logger.error('Error crítico al intentar hacer rollback:', rollbackErr);
         }
       }
       if (err.message === 'cuenta-ya-registrada') {
