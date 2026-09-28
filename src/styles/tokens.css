@@ -7,22 +7,27 @@
      declaración individual — todo font-size del proyecto está en rem. */
   font-size: 115%;
 
-  /* Colors */
-  --color-text-primary: #111111;
-  --color-text-secondary: #4a4a4a;
+  /* Colors — paleta Club Ciudad de Buenos Aires (rama ciudad): celeste #4B9CD3,
+     blanco #FFFFFF, azul #0D2040, negro #111111. */
+  --color-text-primary: #0d2040;
+  --color-text-secondary: #4a5568;
   /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
-  --color-text-placeholder: #707070;
-  --color-bg: #f5f5f5;
+  --color-text-placeholder: #6b7686;
+  --color-bg: #eef3f8;
   --color-surface: #ffffff;
-  --color-border: #e8e8e8;
-  --color-border-medium: #d0d0d0;
-  --color-border-strong: #111111;
-  --color-border-light: #efefef;
+  --color-border: #dfe7ef;
+  --color-border-medium: #c3d0dc;
+  --color-border-strong: #0d2040;
+  --color-border-light: #eaf0f6;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
-  --color-row-hover: #f8f8f8;
-  --color-bg-subtle: #f0f0f0;
+  --color-row-hover: #eaf2f9;
+  --color-bg-subtle: #e4edf5;
   --color-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Acento de marca (celeste) */
+  --color-accent: #4b9cd3;
+  --color-accent-hover: #ffffff;
   /* Scrim de modales (material sobre el contenido). */
   --color-scrim: rgba(0, 0, 0, 0.38);
   --scrim-blur: blur(4px);

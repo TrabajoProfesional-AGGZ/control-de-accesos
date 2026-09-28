@@ -146,7 +146,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
           initial={{ height: '100%' }}
           animate={
             exiting
-              ? { height: '100%', backgroundColor: ['#111111', '#4A4A4A', '#F5F5F5'] }
+              ? { height: '100%', backgroundColor: ['#4B9CD3', '#4A4A4A', '#F5F5F5'] }
               : { height: animStarted ? '30%' : '100%' }
           }
           transition={
@@ -167,6 +167,14 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
+          <motion.p
+            className="login-band-caption"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+          >
+            By SocioUnido
+          </motion.p>
         </motion.div>
       )}
 
@@ -177,7 +185,7 @@ export function LoginEmpleado({ irAReclamo, onIngresoCompleto = () => {} }) {
         className="login-form-wrapper"
       >
         <motion.h2 variants={formItemVariants} className="login-slogan">
-          Control de acceso del club, gestionado por <b>SocioUnido</b>
+          Control de Acceso <b>C.C.B.A.</b>
         </motion.h2>
 
         <motion.form onSubmit={manejarLogin} variants={formItemVariants}>
